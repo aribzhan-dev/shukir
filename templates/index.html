@@ -1,0 +1,112 @@
+{% load static %}
+{% load translation_filter %}
+
+<!DOCTYPE html>
+<html lang="{{ lang_code }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ "page_title"|translate:lang_code }}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <img src="{% static 'img/logo.png' %}" alt="Logo">
+      </div>
+      <form method="get" action="/" id="langForm">
+        <select class="lang-select" name="lang" onchange="changeLang(this.value)">
+          <option value="uz" {% if lang_code == 'uz' %}selected{% endif %}>O'zbek</option>
+          <option value="ru" {% if lang_code == 'ru' %}selected{% endif %}>Русский</option>
+          <option value="kk" {% if lang_code == 'kk' %}selected{% endif %}>Қазақ</option>
+        </select>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <div class="form-container">
+      <div class="form-header">
+        <h3>{{ "form_title"|translate:lang_code }}</h3>
+        <p>{{ "form_subtitle"|translate:lang_code }}</p>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+          <div class="col">
+            <label>{{ "name_label"|translate:lang_code }} *</label>
+            <input type="text" name="name" required />
+          </div>
+          <div class="col">
+            <label>{{ "surname_label"|translate:lang_code }} *</label>
+            <input type="text" name="surname" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>{{ "age_label"|translate:lang_code }} *</label>
+            <input type="number" name="age" required />
+          </div>
+          <div class="col">
+            <label>{{ "iin_label"|translate:lang_code }} *</label>
+            <input type="text" name="iin" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>{{ "phone_label"|translate:lang_code }} *</label>
+            <input type="tel" name="phone_number" placeholder="+7 777 777 77 77" required />
+          </div>
+          <div class="col">
+            <label>{{ "children_label"|translate:lang_code }} *</label>
+            <input type="number" name="child_in_fam" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
+            <label>{{ "status_label"|translate:lang_code }} *</label>
+            <select name="material_status" required>
+              <option value="">{{ "choose_status"|translate:lang_code }}</option>
+              {% for status in statuses %}
+                <option value="{{ status.id }}">{{ status.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
+            <label>{{ "address_label"|translate:lang_code }} *</label>
+            <input type="text" name="address" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
+            <label>{{ "reason_label"|translate:lang_code }} *</label>
+            <textarea name="why_need_help" required></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">{{ "submit_button"|translate:lang_code }}</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 {{ "footer_text"|translate:lang_code }}</p>
+  </footer>
+
+  <script>
+    function changeLang(lang) {
+      window.location.href = "/" + lang + "/";
+    }
+  </script>
+</body>
+</html>
