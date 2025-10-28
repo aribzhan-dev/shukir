@@ -14,7 +14,7 @@ def get_translations(lang_code):
     language = Language.objects.filter(code=lang_code).first()
     translations = {}
     if language:
-        qs = Translation.objects.filter(language=language, status=1)
+        qs = Translation.objects.filter(language=language, status=0)
         for tr in qs:
             translations[tr.key] = tr.value
     return translations
@@ -22,7 +22,10 @@ def get_translations(lang_code):
 
 @csrf_exempt
 def index_handler(request, lang_code="uz"):
+    languages = Language.objects.filter(status=0)
     language = Language.objects.filter(code=lang_code).first()
+    if not language:
+        language = Language.objects.filter(code="uz").first()
     translations = get_translations(lang_code)
     statuses = MaterialsStatus.objects.filter(language=language, status=0)
 
@@ -97,6 +100,7 @@ def index_handler(request, lang_code="uz"):
         "lang_code": lang_code,
         "statuses": statuses,
         "tr": translations,
+        "languages": languages,
     }
     return render(request, "index.html", context)
 
