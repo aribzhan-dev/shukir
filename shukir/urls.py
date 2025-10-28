@@ -17,10 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from main.views import index_handler, success_page
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index_handler),
     path('<str:lang_code>/', index_handler, name='help_request'),
     path('<str:lang_code>/success/', success_page, name='success_page'),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

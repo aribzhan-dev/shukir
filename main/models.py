@@ -42,6 +42,23 @@ class MaterialsStatus(models.Model):
         verbose_name_plural = "Семейные положения"
 
 
+
+class HelpCategory(models.Model):
+    title = models.CharField(max_length=250, verbose_name="Название категории помощи")
+    language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True)
+    status = models.IntegerField(default=0, verbose_name="Статус")
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Категория помощи"
+        verbose_name_plural = "Категории помощи"
+
+
+
+
+
 class HelpRequest(models.Model):
     name = models.CharField( max_length=200, verbose_name="Имя")
     surname = models.CharField( max_length=200, verbose_name="Фамилия")
@@ -49,10 +66,12 @@ class HelpRequest(models.Model):
     email = models.EmailField( blank=True, null=True, verbose_name="Электронная почта")
     phone_number = models.CharField( max_length=20, verbose_name="Номер телефона")
     material_status = models.ForeignKey( MaterialsStatus, on_delete=models.CASCADE, verbose_name="Семейное положение")
+    help_category = models.ForeignKey(HelpCategory, on_delete=models.CASCADE, verbose_name="Категория помощи", blank=True, null=True)
     child_in_fam = models.IntegerField( default=0, blank=True, verbose_name="Количество детей")
     address = models.CharField( max_length=200, verbose_name="Адрес")
     iin = models.CharField( max_length=12, blank=True, verbose_name="ИИН")
-    why_need_help = models.TextField( verbose_name="Причина обращения за помощью")
+    why_need_help = models.TextField(verbose_name="Причина обращения за помощью")
+    file = models.FileField(upload_to='uploads/', blank=True, verbose_name="Изображение")
     status = models.IntegerField( default=0, verbose_name="Статус")
 
     def __str__(self):

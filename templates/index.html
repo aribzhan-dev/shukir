@@ -32,7 +32,7 @@
         <p>{{ "form_subtitle"|translate:lang_code }}</p>
       </div>
 
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="row">
@@ -77,6 +77,31 @@
                 <option value="{{ status.id }}">{{ status.title }}</option>
               {% endfor %}
             </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
+            <label>{{ "help_category_label"|translate:lang_code }} *</label>
+            <select name="help_category" required>
+              <option value="">{{ "choose_category"|translate:lang_code }}</option>
+              {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
+            <label>📷 {{ "file_upload_label"|translate:lang_code }} *</label>
+            <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
+
+            <div class="upload-box" onclick="document.getElementById('file').click()">
+              <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden />
+              <div class="upload-icon">⬆️</div>
+              <p class="upload-text">{{ "file_upload_btn"|translate:lang_code }}</p>
+            </div>
           </div>
         </div>
 
