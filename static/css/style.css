@@ -181,22 +181,14 @@ form {
 
 .upload-box {
   border: 2px dashed #6ad48c;
-  background-color: rgba(130, 255, 180, 0.05);
+  background-color: rgba(130, 255, 180, 0.08);
   border-radius: 16px;
   padding: 40px 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.upload-box {
-  border: 2px dashed #6ad48c;
-  background-color: #f8fff9;
-  border-radius: 16px;
-  padding: 40px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .upload-box:hover {
@@ -211,9 +203,13 @@ form {
 }
 
 .upload-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  display: inline-block;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  color: #222;
 }
 
 .upload-hint {

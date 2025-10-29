@@ -156,6 +156,17 @@
       const otherRow = document.getElementById('otherCategoryRow');
       otherRow.style.display = isOther ? 'block' : 'none';
     }
+    function showFileName() {
+      const fileInput = document.getElementById('file');
+      const uploadText = document.getElementById('uploadText');
+      if (fileInput.files.length > 0) {
+        let fileName = fileInput.files[0].name;
+        if (fileName.length > 40) fileName = fileName.slice(0, 37) + "..."; // qisqartirish
+        uploadText.textContent = fileName;
+      } else {
+        uploadText.textContent = "Fayl tanlash";
+      }
+    }
   </script>
 </body>
 </html>
