@@ -46,6 +46,7 @@ class MaterialsStatus(models.Model):
 class HelpCategory(models.Model):
     title = models.CharField(max_length=250, verbose_name="Название категории помощи")
     language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True)
+    is_other = models.BooleanField(default=False, verbose_name="Является 'Другое'")
     status = models.IntegerField(default=0, verbose_name="Статус")
 
     def __str__(self):
@@ -67,6 +68,7 @@ class HelpRequest(models.Model):
     phone_number = models.CharField( max_length=20, verbose_name="Номер телефона")
     material_status = models.ForeignKey( MaterialsStatus, on_delete=models.CASCADE, verbose_name="Семейное положение")
     help_category = models.ForeignKey(HelpCategory, on_delete=models.CASCADE, verbose_name="Категория помощи", blank=True, null=True)
+    other_category = models.CharField(max_length=250, blank=True, null=True, verbose_name="Другая категория")
     child_in_fam = models.IntegerField( default=0, blank=True, verbose_name="Количество детей")
     address = models.CharField( max_length=200, verbose_name="Адрес")
     iin = models.CharField( max_length=12, blank=True, verbose_name="ИИН")

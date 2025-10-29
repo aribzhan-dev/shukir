@@ -10,20 +10,18 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
 </head>
 <body>
-  <header>
-    <div class="container header-content">
-      <div class="logo">
-        <img src="{% static 'img/logo.png' %}" alt="Logo">
-      </div>
-      <form method="get" action="/" id="langForm">
-        <select class="lang-select" name="lang" onchange="changeLang(this.value)">
+
+    <header class="main-header">
+      <div class="header-overlay">
+        <div class="lang-container">
           {% for lan in languages %}
-          <option value="{{ lan.code }}" {% if lang_code == lan.code %}selected{% endif %}>{{ lan.title }}</option>
+            <a href="/{{ lan.code }}/" class="lang-link {% if lang_code == lan.code %}active{% endif %}">
+              {{ lan.title }}
+            </a>
           {% endfor %}
-        </select>
-      </form>
-    </div>
-  </header>
+        </div>
+      </div>
+    </header>
 
   <main>
     <div class="form-container">
@@ -83,12 +81,21 @@
         <div class="row">
           <div class="col full">
             <label>{{ "help_category_label"|translate:lang_code }} *</label>
-            <select name="help_category" required>
+            <select name="help_category" id="helpCategory" required onchange="toggleOtherCategory(this)">
               <option value="">{{ "choose_category"|translate:lang_code }}</option>
               {% for category in categories %}
-                  <option value="{{ category.id }}">{{ category.title }}</option>
+                <option value="{{ category.id }}" data-is-other="{{ category.is_other|yesno:'true,false' }}">
+                  {{ category.title }}
+                </option>
               {% endfor %}
             </select>
+          </div>
+        </div>
+
+        <div class="row" id="otherCategoryRow" style="display:none;">
+          <div class="col full">
+            <label>{{ "other_category_label"|translate:lang_code }}</label>
+            <input type="text" name="other_category" placeholder="{{ 'enter_other_category'|translate:lang_code }}" />
           </div>
         </div>
 
@@ -98,9 +105,9 @@
             <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
 
             <div class="upload-box" onclick="document.getElementById('file').click()">
-              <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden />
+              <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden onchange="showFileName()" />
               <div class="upload-icon">⬆️</div>
-              <p class="upload-text">{{ "file_upload_btn"|translate:lang_code }}</p>
+              <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
             </div>
           </div>
         </div>
@@ -131,6 +138,23 @@
   <script>
     function changeLang(lang) {
       window.location.href = "/" + lang + "/";
+    }
+    function showFileName() {
+        const input = document.getElementById('file');
+        const text = document.getElementById('uploadText');
+        if (input.files.length > 0) {
+          text.textContent = input.files[0].name;
+          text.style.color = "#222";
+        } else {
+          text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
+          text.style.color = "#666";
+        }
+    }
+    function toggleOtherCategory(select) {
+      const selectedOption = select.options[select.selectedIndex];
+      const isOther = selectedOption.getAttribute('data-is-other') === 'true';
+      const otherRow = document.getElementById('otherCategoryRow');
+      otherRow.style.display = isOther ? 'block' : 'none';
     }
   </script>
 </body>

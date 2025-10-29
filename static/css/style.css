@@ -34,49 +34,90 @@ header {
   padding: 10px 0;
 }
 
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.logo img {
-  height: 50px;
-  transform: scale(1.1) translateY(2px);
-}
-
-.lang-select {
-  border: 2px solid #6ab47b;
-  background: #fff;
-  color: #222;
-  border-radius: 8px;
-  padding: 8px 34px 8px 12px;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
+.main-header {
   position: relative;
-  transition: 0.25s ease;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='14' viewBox='0 0 24 24' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
+  width: 100%;
+  height: 700px;
+  background: url("/static/video/shukir.gif") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.lang-select:hover {
-  border-color: #5ca86c;
-  box-shadow: 0 0 0 3px rgba(106, 180, 123, 0.25);
+.header-overlay {
+  background: rgba(0, 0, 0, 0.45);
+  width: 100%;
+  height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.lang-select:focus {
-  border-color: #5ca86c;
-  box-shadow: 0 0 0 3px rgba(106, 180, 123, 0.25);
+
+.lang-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  padding: 12px 24px;
+  border-radius: 20px;
+  z-index: 10;
 }
+
+.lang-link {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.lang-link:hover {
+  color: #79fcb6;
+}
+
+.lang-link.active {
+  color: #4ff389;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .lang-container {
+    bottom: 25px;
+    gap: 24px;
+    padding: 10px 18px;
+    border-radius: 16px;
+  }
+
+  .lang-link {
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .lang-container {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 14px;
+    border-radius: 14px;
+    bottom: 20px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lang-link {
+    font-size: 16px;
+    letter-spacing: 0.4px;
+  }
+}
+
 
 /* Main */
 main {
@@ -139,37 +180,46 @@ form {
 }
 
 .upload-box {
-  border: 2px dashed #7bd99b;
-  border-radius: 12px;
-  background-color: #f0fff4;
+  border: 2px dashed #6ad48c;
+  background-color: rgba(130, 255, 180, 0.05);
+  border-radius: 16px;
   padding: 40px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.upload-box {
+  border: 2px dashed #6ad48c;
+  background-color: #f8fff9;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .upload-box:hover {
-  background-color: #e6fff0;
-  border-color: #43c27f;
+  background-color: #eafff0;
+  border-color: #4ff389;
 }
 
 .upload-icon {
-  font-size: 32px;
-  color: #43c27f;
+  font-size: 36px;
   margin-bottom: 10px;
+  color: #4ff389;
 }
 
 .upload-text {
-  font-weight: 600;
   font-size: 18px;
-  color: #218b55;
-  margin: 0;
+  font-weight: 600;
+  color: #333;
 }
 
 .upload-hint {
   font-size: 14px;
-  color: #6b7280;
-  margin-top: 5px;
+  color: #777;
+  margin-top: 6px;
 }
 
 label {

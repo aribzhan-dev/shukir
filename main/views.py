@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCategory
 import requests
+import os
+import mimetypes
 
 TELEGRAM_BOT_TOKEN = "8240282392:AAGtvnPfS3A0R6KQFydGXtBy1vuJ6VUuu9M"
 TELEGRAM_CHAT_ID = "-1003120018187"
@@ -36,6 +38,7 @@ def index_handler(request, lang_code="uz"):
         phone = request.POST.get("phone_number")
         status_id = request.POST.get("material_status")
         category_id = request.POST.get("help_category")
+        other_category = request.POST.get("other_category")
         child_count = request.POST.get("child_in_fam")
         address = request.POST.get("address")
         iin = request.POST.get("iin")
@@ -53,15 +56,20 @@ def index_handler(request, lang_code="uz"):
             phone_number=phone,
             material_status=material_status,
             help_category=help_category,
+            other_category=other_category,
             child_in_fam=int(child_count or 0),
             address=address,
             iin=iin,
             why_need_help=reason,
-            file=file,  # ✅ shu yerda ham
+            file=file,
             status=0,
         )
 
-        # Telegram uchun xabar
+
+        category_text = help_category.title
+        if help_category.is_other and other_category:
+            category_text += f" ({other_category})"
+
         if lang_code == "ru":
             message = (
                 f"🟢 Поступила новая заявка на помощь:\n\n"
@@ -70,9 +78,8 @@ def index_handler(request, lang_code="uz"):
                 f"📅 Возраст: {help_request.age}\n"
                 f"👶 Количество детей: {help_request.child_in_fam}\n"
                 f"🏡 Адрес: {help_request.address}\n"
-                f"🏷️ Категория: {help_category.title if help_category else '-'}\n"
-                f"💍 Семейное положение: {material_status.title if material_status else '-'}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
+                f"📂 Категория: {category_text}\n"
                 f"💬 Причина: {help_request.why_need_help}"
             )
         elif lang_code == "kk":
@@ -83,9 +90,8 @@ def index_handler(request, lang_code="uz"):
                 f"📅 Жасы: {help_request.age}\n"
                 f"👶 Балалар саны: {help_request.child_in_fam}\n"
                 f"🏡 Мекенжай: {help_request.address}\n"
-                f"🏷️ Категория: {help_category.title if help_category else '-'}\n"
-                f"💍 Отбасылық жағдай: {material_status.title if material_status else '-'}\n"
                 f"🆔 ЖСН: {help_request.iin}\n"
+                f"📂 Санат: {category_text}\n"
                 f"💬 Себебі: {help_request.why_need_help}"
             )
         else:
@@ -96,9 +102,8 @@ def index_handler(request, lang_code="uz"):
                 f"📅 Ёши: {help_request.age}\n"
                 f"👶 Фарзандлар сони: {help_request.child_in_fam}\n"
                 f"🏡 Манзил: {help_request.address}\n"
-                f"🏷️ Ёрдам тўифаси: {help_category.title if help_category else '-'}\n"
-                f"💍 Оилавий ҳолати: {material_status.title if material_status else '-'}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
+                f"📂 Тоифа: {category_text}\n"
                 f"💬 Сабаб: {help_request.why_need_help}"
             )
 
@@ -115,32 +120,67 @@ def index_handler(request, lang_code="uz"):
     return render(request, "index.html", context)
 
 
-def send_to_telegram(text, file_path=None):
+
+
+
+
+
+def send_to_telegram(text=None, file_path=None):
     base_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
     try:
-        if file_path:
-            with open(file_path, "rb") as file:
-                response = requests.post(
-                    f"{base_url}/sendDocument",
-                    data={"chat_id": TELEGRAM_CHAT_ID, "caption": text},
-                    files={"document": file},
-                    timeout=10,
-                )
-        else:
+
+        if file_path is None:
             response = requests.post(
                 f"{base_url}/sendMessage",
-                data={"chat_id": TELEGRAM_CHAT_ID, "text": text},
+                data={
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "text": text or "",
+                    "parse_mode": "MarkdownV2",
+                },
                 timeout=10,
             )
+            response.raise_for_status()
+            return
 
-        response.raise_for_status()
+
+        mime_type, _ = mimetypes.guess_type(file_path)
+        file_type = "document"  # default
+
+        if mime_type:
+            if mime_type.startswith("image/"):
+                file_type = "photo"
+            elif mime_type.startswith("video/"):
+                file_type = "video"
+
+
+        with open(file_path, "rb") as f:
+            files = {file_type: (os.path.basename(file_path), f)}
+            endpoint = {
+                "photo": "sendPhoto",
+                "video": "sendVideo",
+                "document": "sendDocument",
+            }[file_type]
+
+            response = requests.post(
+                f"{base_url}/{endpoint}",
+                data={
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "caption": text or "",
+                },
+                files=files,
+                timeout=30,
+            )
+            response.raise_for_status()
+
+        print(f"✅ Telegram’га {file_type} муваффақиятли юборилди.")
+
     except requests.exceptions.Timeout:
         print("⏳ Telegram жавоб бермади (timeout).")
     except requests.exceptions.ConnectionError:
         print("⚠️ Интернет ёки Telegram API блокланган.")
     except Exception as e:
-        print("❌ Номаълум хатолик:", e)
+        print(f"❌ Telegram хатолик: {e}")
 
 
 
