@@ -12,7 +12,8 @@
 }
 
 body {
-  background: linear-gradient(to bottom right, #f9fbff, #eef3ff);
+  /*background: linear-gradient(to bottom right, #f9fbff, #eef3ff);*/
+  background-color: rgba(106, 180, 123, 0.25);
   color: #111;
 }
 
@@ -37,7 +38,7 @@ header {
 .main-header {
   position: relative;
   width: 100%;
-  height: 700px;
+  height: 750px;
   background: url("/static/video/shukir.gif") center/cover no-repeat;
   display: flex;
   align-items: center;
@@ -45,9 +46,9 @@ header {
 }
 
 .header-overlay {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(106, 180, 123, 0.25);
   width: 100%;
-  height: 700px;
+  height: 750px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,9 +93,9 @@ header {
 
 
 .lang-btn.active {
-  background: #1a9b0f;
+  background: #68a93a;
   color: #ffffff;
-  border-color: #1a9b0f;
+  border-color: #68a93a;
   box-shadow: 0 0 10px rgba(106, 212, 140, 0.6);
   transform: translateY(-2px);
 }
@@ -120,19 +121,20 @@ main {
 }
 
 .form-header {
-  background: #e7efff;
+  background: #68a93a;
   text-align: center;
   padding: 20px;
 }
 
 .form-header h3 {
-  color: #002b8a;
+  color: #ffffff;
   margin-bottom: 5px;
+  font-size: 26px;
 }
 
 .form-header p {
-  color: #444;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 13px;
 }
 
 form {
@@ -225,12 +227,12 @@ form {
 
 .counter-container input {
   width: 100px;
-  height: 45px;
+  padding: 8px;
   text-align: center;
   font-size: 18px;
   color: #000;
   background: rgb(246, 246, 248);
-  border: 1.5px solid rgb(221, 221, 221);
+  border: 1px solid rgb(221, 221, 221);
   border-radius: 8px;
   outline: none;
   transition: all 0.3s ease;
@@ -242,12 +244,12 @@ form {
 
 .counter-btn {
   width: 100px;
-  height: 45px;
   font-size: 22px;
-  font-weight: 600;
+  padding: 6px;
+  font-weight: 500;
   color: #333;
   background-color: rgb(246, 246, 248);
-  border: 1.5px solid rgb(221, 221, 221);
+  border: 1px solid rgb(221, 221, 221);
   border-radius: 8px;
   cursor: pointer;
   transition: 0.25s ease;
@@ -264,9 +266,9 @@ form {
 }
 
 label {
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 6px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 input, select, textarea {
@@ -285,7 +287,7 @@ textarea {
 
 .submit-btn {
   width: 100%;
-  background: #1a9b0f;
+  background: #68a93a;
   color: #fff;
   border: none;
   padding: 12px;
@@ -305,7 +307,90 @@ footer {
   margin-bottom: 20px;
 }
 
-/* ✅ Responsive */
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+.submit-btn:focus {
+  border-color: #6ab47b;
+  box-shadow: 0 0 0 3px rgba(106, 180, 123, 0.25);
+  background-color: #f6fff7;
+  transition: all 0.25s ease;
+}
+
+
+input:active,
+textarea:active,
+select:active,
+button:active {
+  background-color: #ecfff0;
+  border-color: #4fb877;
+  transform: scale(0.99);
+}
+
+.submit-btn:active {
+  background: #3e9a63;
+  transform: scale(0.98);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="email"],
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #f6f6f8;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  font-size: 16px;
+  font-family: "Inter", sans-serif;
+  color: #222;
+  transition: all 0.25s ease;
+  box-shadow: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #6ab47b;
+  box-shadow: 0 0 0 3px rgba(106, 180, 123, 0.25);
+  background-color: #f6fff7;
+  outline: none;
+}
+
+
+.counter-btn {
+  width: 80px;
+  height: 45px;
+  font-size: 22px;
+  font-weight: 500;
+  color: #333;
+  background-color: #f9f9f9;
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: none;
+}
+
+.counter-btn:hover {
+  background-color: #f3fff7;
+  border-color: #4fb877;
+}
+
+.counter-btn:active {
+  background-color: #e7ffe8;
+  transform: scale(0.98);
+}
+
+
+
 @media (max-width: 768px) {
   .row {
     flex-direction: column;
@@ -391,6 +476,58 @@ footer {
   .lang-link {
     font-size: 16px;
     letter-spacing: 0.4px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  input,
+  textarea,
+  select,
+  button {
+    font-size: 15px;
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .submit-btn {
+    padding: 14px;
+    font-size: 16px;
+  }
+}
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .upload-box {
+    padding: 25px 10px;
+    min-height: 130px;
+  }
+
+  .upload-icon svg {
+    width: 45px;
+    height: 45px;
+    stroke-width: 1.8;
+  }
+
+  .upload-text {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  .upload-hint {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .upload-desc {
+    font-size: 13px;
   }
 }
 
