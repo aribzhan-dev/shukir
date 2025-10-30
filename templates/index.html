@@ -15,7 +15,7 @@
       <div class="header-overlay">
         <div class="lang-container">
           {% for lan in languages %}
-            <a href="/{{ lan.code }}/" class="lang-link {% if lang_code == lan.code %}active{% endif %}">
+            <a href="/{{ lan.code }}/" class="lang-btn {% if lang_code == lan.code %}active{% endif %}">
               {{ lan.title }}
             </a>
           {% endfor %}
@@ -99,17 +99,19 @@
           </div>
         </div>
 
-        <div class="row">
-          <div class="col full">
-            <label>📷 {{ "file_upload_label"|translate:lang_code }} *</label>
-            <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
+        <div class="upload-box" onclick="document.getElementById('file').click()">
+          <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden onchange="showFileName()" />
 
-            <div class="upload-box" onclick="document.getElementById('file').click()">
-              <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden onchange="showFileName()" />
-              <div class="upload-icon">⬆️</div>
-              <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
-            </div>
+          <!-- Cloud Upload SVG -->
+          <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#6ad48c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 16l-4-4-4 4"></path>
+              <path d="M12 12v9"></path>
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"></path>
+            </svg>
           </div>
+
+          <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
         </div>
 
         <div class="row">
