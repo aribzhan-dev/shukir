@@ -154,6 +154,7 @@ form {
 
 .col.full {
   flex: 100%;
+  margin-top: 15px;
 }
 
 .upload-desc {
@@ -205,7 +206,7 @@ form {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 500;
   color: #222;
 }
 
