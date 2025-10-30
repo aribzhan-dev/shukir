@@ -60,10 +60,14 @@
             <label>{{ "phone_label"|translate:lang_code }} *</label>
             <input type="tel" name="phone_number" placeholder="{{ 'phone_placeholder'|translate:lang_code }}" required />
           </div>
-          <div class="col">
-            <label>{{ "children_label"|translate:lang_code }} *</label>
-            <input type="number" name="child_in_fam" required placeholder="{{ 'children_placeholder'|translate:lang_code }}" />
-          </div>
+            <div class="col">
+              <label>{{ "children_label"|translate:lang_code }} *</label>
+              <div class="counter-container">
+                <button type="button" class="counter-btn" onclick="decreaseCount()">−</button>
+                <input type="number" id="childCount" name="child_in_fam" value="0" min="0" required />
+                <button type="button" class="counter-btn" onclick="increaseCount()">+</button>
+              </div>
+            </div>
         </div>
 
         <div class="row">
@@ -158,6 +162,16 @@
       } else {
         uploadText.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
       }
+    }
+    function increaseCount() {
+        const input = document.getElementById('childCount');
+        input.value = parseInt(input.value || 0) + 1;
+    }
+
+    function decreaseCount() {
+        const input = document.getElementById('childCount');
+        const current = parseInt(input.value || 0);
+        if (current > 0) input.value = current - 1;
     }
   </script>
 </body>
