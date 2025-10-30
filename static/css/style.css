@@ -293,4 +293,16 @@ footer {
     height: 60px;
   }
 }
+@media (max-width: 600px) {
+  .upload-box {
+    padding: 25px 15px;
+  }
+
+  .upload-text {
+    font-size: 14px;
+    white-space: normal;
+    word-break: break-all;
+    text-overflow: clip;
+  }
+}
 
