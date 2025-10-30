@@ -11,17 +11,17 @@
 </head>
 <body>
 
-    <header class="main-header">
-      <div class="header-overlay">
-        <div class="lang-container">
-          {% for lan in languages %}
-            <a href="/{{ lan.code }}/" class="lang-btn {% if lang_code == lan.code %}active{% endif %}">
-              {{ lan.title }}
-            </a>
-          {% endfor %}
-        </div>
+  <header class="main-header">
+    <div class="header-overlay">
+      <div class="lang-container">
+        {% for lan in languages %}
+          <a href="/{{ lan.code }}/" class="lang-btn {% if lang_code == lan.code %}active{% endif %}">
+            {{ lan.title }}
+          </a>
+        {% endfor %}
       </div>
-    </header>
+    </div>
+  </header>
 
   <main>
     <div class="form-container">
@@ -36,33 +36,33 @@
         <div class="row">
           <div class="col">
             <label>{{ "name_label"|translate:lang_code }} *</label>
-            <input type="text" name="name" required />
+            <input type="text" name="name" required placeholder="{{ 'name_placeholder'|translate:lang_code }}" />
           </div>
           <div class="col">
             <label>{{ "surname_label"|translate:lang_code }} *</label>
-            <input type="text" name="surname" required />
+            <input type="text" name="surname" required placeholder="{{ 'surname_placeholder'|translate:lang_code }}" />
           </div>
         </div>
 
         <div class="row">
           <div class="col">
             <label>{{ "age_label"|translate:lang_code }} *</label>
-            <input type="number" name="age" required />
+            <input type="number" name="age" required placeholder="{{ 'age_placeholder'|translate:lang_code }}" />
           </div>
           <div class="col">
             <label>{{ "iin_label"|translate:lang_code }} *</label>
-            <input type="text" name="iin" required />
+            <input type="text" name="iin" required placeholder="{{ 'iin_placeholder'|translate:lang_code }}" />
           </div>
         </div>
 
         <div class="row">
           <div class="col">
             <label>{{ "phone_label"|translate:lang_code }} *</label>
-            <input type="tel" name="phone_number" placeholder="+7 777 777 77 77" required />
+            <input type="tel" name="phone_number" placeholder="{{ 'phone_placeholder'|translate:lang_code }}" required />
           </div>
           <div class="col">
             <label>{{ "children_label"|translate:lang_code }} *</label>
-            <input type="number" name="child_in_fam" required />
+            <input type="number" name="child_in_fam" required placeholder="{{ 'children_placeholder'|translate:lang_code }}" />
           </div>
         </div>
 
@@ -106,7 +106,6 @@
 
             <div class="upload-box" onclick="document.getElementById('file').click()">
               <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden onchange="showFileName()" />
-
               <div class="upload-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#6ad48c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 16l-4-4-4 4"></path>
@@ -115,7 +114,7 @@
                 </svg>
               </div>
               <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
-               <p class="upload-hint">{{ "file_upload_info"|translate:lang_code }}</p>
+              <p class="upload-hint">{{ "file_upload_info"|translate:lang_code }}</p>
             </div>
           </div>
         </div>
@@ -123,14 +122,14 @@
         <div class="row">
           <div class="col full">
             <label>{{ "address_label"|translate:lang_code }} *</label>
-            <input type="text" name="address" required />
+            <input type="text" name="address" required placeholder="{{ 'address_placeholder'|translate:lang_code }}" />
           </div>
         </div>
 
         <div class="row">
           <div class="col full">
             <label>{{ "reason_label"|translate:lang_code }} *</label>
-            <textarea name="why_need_help" required></textarea>
+            <textarea name="why_need_help" required placeholder="{{ 'reason_placeholder'|translate:lang_code }}"></textarea>
           </div>
         </div>
 
@@ -144,35 +143,20 @@
   </footer>
 
   <script>
-    function changeLang(lang) {
-      window.location.href = "/" + lang + "/";
-    }
-    function showFileName() {
-        const input = document.getElementById('file');
-        const text = document.getElementById('uploadText');
-        if (input.files.length > 0) {
-          text.textContent = input.files[0].name;
-          text.style.color = "#222";
-        } else {
-          text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
-          text.style.color = "#666";
-        }
-    }
     function toggleOtherCategory(select) {
       const selectedOption = select.options[select.selectedIndex];
       const isOther = selectedOption.getAttribute('data-is-other') === 'true';
-      const otherRow = document.getElementById('otherCategoryRow');
-      otherRow.style.display = isOther ? 'block' : 'none';
+      document.getElementById('otherCategoryRow').style.display = isOther ? 'block' : 'none';
     }
     function showFileName() {
       const fileInput = document.getElementById('file');
       const uploadText = document.getElementById('uploadText');
       if (fileInput.files.length > 0) {
         let fileName = fileInput.files[0].name;
-        if (fileName.length > 40) fileName = fileName.slice(0, 37) + "..."; // qisqartirish
+        if (fileName.length > 40) fileName = fileName.slice(0, 37) + "...";
         uploadText.textContent = fileName;
       } else {
-        uploadText.textContent = "Fayl tanlash";
+        uploadText.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
       }
     }
   </script>
