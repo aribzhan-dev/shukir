@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,7 +123,25 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# for django decoration
+JAZZMIN_SETTINGS = {
+    "site_title": "Shukir Admin",
+    "site_header": "Hayriya Fondi",
+    "site_brand": "Shukir",
+    "site_logo": "img/shukir.jpeg",
+    "site_logo_classes": "img-fluid",
+    "site_logo_width": 70,
+    "site_logo_height": 70,
+    "welcome_sign": "Xush kelibsiz, admin!",
+    "copyright": "© 2025 Shukir Charity Foundation",
+    "show_ui_builder": True,
+
+
+    # Theme
+    "theme": "flatly",  # boshqa variantlar: flatly, superhero, cosmo, simplex va h.k.
+}
 
 
 
