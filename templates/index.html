@@ -105,11 +105,31 @@
 
         <div class="row">
           <div class="col full">
+            <label>{{ "received_other_help_label"|translate:lang_code }} *</label>
+              <div class="radio-group">
+              <label>
+                <input type="radio" name="received_other_help" value="yes" required>
+                {{ "yes_option"|translate:lang_code }}
+              </label>
+              <label>
+                <input type="radio" name="received_other_help" value="no" required>
+                {{ "no_option"|translate:lang_code }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col full">
             <label>{{ "file_upload_label"|translate:lang_code }} *</label>
             <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
 
             <div class="upload-box" onclick="document.getElementById('file').click()">
-              <input type="file" id="file" name="file" accept="image/*,.pdf" required hidden onchange="showFileName()" />
+              <input
+                type="file"
+                id="file"
+                name="file"
+                accept="image/*,.pdf" multiple required hidden="" onchange="showFileName()" />
               <div class="upload-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#6ad48c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 16l-4-4-4 4"></path>
@@ -153,14 +173,18 @@
       document.getElementById('otherCategoryRow').style.display = isOther ? 'block' : 'none';
     }
     function showFileName() {
-      const fileInput = document.getElementById('file');
-      const uploadText = document.getElementById('uploadText');
-      if (fileInput.files.length > 0) {
-        let fileName = fileInput.files[0].name;
-        if (fileName.length > 40) fileName = fileName.slice(0, 37) + "...";
-        uploadText.textContent = fileName;
+      const input = document.getElementById('file');
+      const text = document.getElementById('uploadText');
+
+      if (input.files.length > 0) {
+        const fileNames = Array.from(input.files).map(f => f.name);
+        let displayText = fileNames.join(', ');
+        if (displayText.length > 50) displayText = displayText.slice(0, 47) + '...';
+        text.textContent = displayText;
+        text.style.color = "#222";
       } else {
-        uploadText.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
+        text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
+        text.style.color = "#666";
       }
     }
     function increaseCount() {

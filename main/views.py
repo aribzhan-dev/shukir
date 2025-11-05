@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCategory
+from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCategory, HelpRequestFile
 import requests
 import os
 import mimetypes
@@ -43,7 +43,9 @@ def index_handler(request, lang_code="uz"):
         address = request.POST.get("address")
         iin = request.POST.get("iin")
         reason = request.POST.get("why_need_help")
-        file = request.FILES.get("file")
+        received_help = request.POST.get("received_other_help") == "yes"
+        files = request.FILES.getlist('file')
+
 
         material_status = MaterialsStatus.objects.filter(id=status_id).first()
         help_category = HelpCategory.objects.filter(id=category_id).first()
@@ -61,9 +63,12 @@ def index_handler(request, lang_code="uz"):
             address=address,
             iin=iin,
             why_need_help=reason,
-            file=file,
+            received_other_help=received_help,
             status=0,
         )
+
+        for f in files:
+            HelpRequestFile.objects.create(help_request=help_request, file=f)
 
 
         category_text = help_category.title
@@ -80,7 +85,8 @@ def index_handler(request, lang_code="uz"):
                 f"🏡 Адрес: {help_request.address}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
                 f"📂 Категория: {category_text}\n"
-                f"💬 Причина: {help_request.why_need_help}"
+                f"💬 Причина: {help_request.why_need_help}\n"
+                f"📦 Получал ли помощь ранее: {'Да' if help_request.received_other_help else 'Нет'}"
             )
         elif lang_code == "kk":
             message = (
@@ -92,7 +98,8 @@ def index_handler(request, lang_code="uz"):
                 f"🏡 Мекенжай: {help_request.address}\n"
                 f"🆔 ЖСН: {help_request.iin}\n"
                 f"📂 Санат: {category_text}\n"
-                f"💬 Себебі: {help_request.why_need_help}"
+                f"💬 Себебі: {help_request.why_need_help}\n"
+                f"📦 Бұрын көмек алған ба: {'Иә' if help_request.received_other_help else 'Жоқ'}"
             )
         else:
             message = (
@@ -104,10 +111,24 @@ def index_handler(request, lang_code="uz"):
                 f"🏡 Манзил: {help_request.address}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
                 f"📂 Тоифа: {category_text}\n"
-                f"💬 Сабаб: {help_request.why_need_help}"
+                f"💬 Сабаб: {help_request.why_need_help}\n"
+                f"📦 Илгари бошқа хайрия жамғармаларидан ёрдам олганми: {'Ҳа' if help_request.received_other_help else 'Йўқ'}"
             )
 
-        send_to_telegram(message, help_request.file.path if help_request.file else None)
+
+        send_to_telegram(message)
+
+        files = list(help_request.files.all())
+        total = len(files)
+
+        for index, f in enumerate(files, start=1):
+            try:
+                file_path = f.file.path
+                caption = f"📎 Файл {index} из {total} — {help_request.name} {help_request.surname}"
+                send_to_telegram(file_path=file_path, send_text_also=False, caption=caption)
+            except Exception as e:
+                print(f"⚠️ Fayl yuborishda xatolik: {e}")
+
         return redirect(f"/{lang_code}/success/")
 
     context = {
@@ -124,63 +145,55 @@ def index_handler(request, lang_code="uz"):
 
 
 
-
-def send_to_telegram(text=None, file_path=None):
+def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=None):
     base_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
     try:
-
-        if file_path is None:
-            response = requests.post(
+        # 1️⃣ Matn yuborish
+        if text and send_text_also:
+            requests.post(
                 f"{base_url}/sendMessage",
                 data={
                     "chat_id": TELEGRAM_CHAT_ID,
-                    "text": text or "",
-                    "parse_mode": "MarkdownV2",
+                    "text": text,
+                    "parse_mode": "HTML",
                 },
                 timeout=10,
             )
-            response.raise_for_status()
-            return
 
+        # 2️⃣ Fayl yuborish
+        if file_path and os.path.exists(file_path):
+            mime_type, _ = mimetypes.guess_type(file_path)
+            file_type = "document"
+            if mime_type:
+                if mime_type.startswith("image/"):
+                    file_type = "photo"
+                elif mime_type.startswith("video/"):
+                    file_type = "video"
 
-        mime_type, _ = mimetypes.guess_type(file_path)
-        file_type = "document"  # default
-
-        if mime_type:
-            if mime_type.startswith("image/"):
-                file_type = "photo"
-            elif mime_type.startswith("video/"):
-                file_type = "video"
-
-
-        with open(file_path, "rb") as f:
-            files = {file_type: (os.path.basename(file_path), f)}
             endpoint = {
                 "photo": "sendPhoto",
                 "video": "sendVideo",
                 "document": "sendDocument",
             }[file_type]
 
-            response = requests.post(
-                f"{base_url}/{endpoint}",
-                data={
-                    "chat_id": TELEGRAM_CHAT_ID,
-                    "caption": text or "",
-                },
-                files=files,
-                timeout=30,
-            )
-            response.raise_for_status()
+            with open(file_path, "rb") as f:
+                files = {file_type: f}
+                data = {"chat_id": TELEGRAM_CHAT_ID}
+                if caption:
+                    data["caption"] = caption
 
-        print(f"✅ Telegram’га {file_type} муваффақиятли юборилди.")
+                response = requests.post(
+                    f"{base_url}/{endpoint}",
+                    data=data,
+                    files=files,
+                    timeout=60,
+                )
+                response.raise_for_status()
+                print(f"📎 Fayl yuborildi: {os.path.basename(file_path)} — {response.status_code}")
 
-    except requests.exceptions.Timeout:
-        print("⏳ Telegram жавоб бермади (timeout).")
-    except requests.exceptions.ConnectionError:
-        print("⚠️ Интернет ёки Telegram API блокланган.")
     except Exception as e:
-        print(f"❌ Telegram хатолик: {e}")
+        print(f"❌ Telegram xatolik: {e}")
 
 
 

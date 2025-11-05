@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+  <div style="margin-bottom:20px; padding:12px; background:#f8f9fa; border-radius:8px;">
+    <h3 style="margin-bottom:8px;">📊 Статистика по заявкам:</h3>
+    <p>Всего заявок: <strong>{{ summary.total }}</strong></p>
+    <p>Получали помощь ранее: <strong style="color:green;">{{ summary.received }}</strong></p>
+    <p>Не получали помощь ранее: <strong style="color:darkred;">{{ summary.not_received }}</strong></p>
+  </div>
+  {{ block.super }}
+{% endblock %}

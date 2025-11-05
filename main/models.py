@@ -73,7 +73,7 @@ class HelpRequest(models.Model):
     address = models.CharField( max_length=200, verbose_name="Адрес")
     iin = models.CharField( max_length=12, blank=True, verbose_name="ИИН")
     why_need_help = models.TextField(verbose_name="Причина обращения за помощью")
-    file = models.FileField(upload_to='uploads/', blank=True, verbose_name="Изображение")
+    received_other_help = models.BooleanField(default=False, verbose_name="Получал(а) ли ранее помощь от других фондов")
     status = models.IntegerField( default=0, verbose_name="Статус")
 
     def __str__(self):
@@ -82,3 +82,14 @@ class HelpRequest(models.Model):
     class Meta:
         verbose_name = "Заявка на помощь"
         verbose_name_plural = "Заявки на помощь"
+
+
+class HelpRequestFile(models.Model):
+    help_request = models.ForeignKey( HelpRequest, on_delete=models.CASCADE, related_name='files', verbose_name="Заявка на помощь")
+    file = models.FileField(upload_to='uploads/', verbose_name="Файл")
+    class Meta:
+        verbose_name = "Файл заявки"
+        verbose_name_plural = "Файлы заявок"
+
+    def __str__(self):
+        return f"{self.file.name}"
