@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Shukir — Admin{% endblock %}
+
+{% block branding %}
+  <div id="site-name" style="display: flex; align-items: center; gap: 10px;">
+    <img src="{% static 'img/shukir.jpeg' %}" alt="shukir" style="height: 35px; width: 35px; border-radius: 6px;">
+    <h1 id="site-name-text" style="margin: 0; font-size: 20px;">
+      <a href="{% url 'admin:index' %}" style="color: #f0f0f0; text-decoration: none;">
+        Shukir
+      </a>
+    </h1>
+  </div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

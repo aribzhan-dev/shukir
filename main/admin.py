@@ -27,7 +27,7 @@ class MaterialsStatusAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
-# 🟢 ASOSIY QISM: Yordam so‘rovlari uchun admin panel
+# 🟢 ASOSIY QISM
 @admin.register(HelpRequest)
 class HelpRequestAdmin(admin.ModelAdmin):
     list_display = (
@@ -47,29 +47,42 @@ class HelpRequestAdmin(admin.ModelAdmin):
     search_fields = ("name", "surname", "iin", "phone_number", "address")
     list_per_page = 30
     ordering = ("-id",)
-
+    change_list_template = "admin/help_request_changelist.html"
 
     def received_other_help_display(self, obj):
         return "Да" if obj.received_other_help else "Нет"
     received_other_help_display.short_description = "Получал помощь ранее"
 
-
     def changelist_view(self, request, extra_context=None):
+        """
+        Bu funksiya yordamida admin panelda statistik ma’lumotlarni
+        real va filtrlangan holatda ko‘rsatamiz.
+        """
         extra_context = extra_context or {}
-        total_requests = HelpRequest.objects.count()
-        total_received_help = HelpRequest.objects.filter(received_other_help=True).count()
-        total_not_received_help = total_requests - total_received_help
+
+        # 🔹 Hozirgi filterga qarab querysetni olamiz
+        queryset = self.get_queryset(request)
+
+        # 🔹 Umumiy statistika
+        total_requests = queryset.count()
+        total_received_help = queryset.filter(received_other_help=True).count()
+        total_not_received_help = queryset.filter(received_other_help=False).count()
+
+        # 🔹 Toifa bo‘yicha statistikalar
+        category_stats = (
+            queryset.values("help_category__title")
+            .annotate(total=Count("id"))
+            .order_by("-total")
+        )
 
         extra_context["summary"] = {
             "total": total_requests,
             "received": total_received_help,
             "not_received": total_not_received_help,
+            "categories": category_stats,
         }
+
         return super().changelist_view(request, extra_context=extra_context)
-
-
-
-    change_list_template = "admin/help_request_changelist.html"
 
 
 @admin.register(HelpRequestFile)
