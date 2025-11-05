@@ -28,7 +28,12 @@ SECRET_KEY = 'django-insecure-l2i*b6ygq8vfn6&h7sf5gwdwi5@wreh8oauvl9&b0kt8lt5ym!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://shukir.kz",
+    "https://www.shukir.kz",
+]
 
 
 # Application definition
