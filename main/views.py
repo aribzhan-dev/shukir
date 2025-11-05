@@ -149,7 +149,7 @@ def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=Non
     base_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
     try:
-        # 1️⃣ Matn yuborish
+
         if text and send_text_also:
             requests.post(
                 f"{base_url}/sendMessage",
@@ -161,7 +161,7 @@ def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=Non
                 timeout=10,
             )
 
-        # 2️⃣ Fayl yuborish
+
         if file_path and os.path.exists(file_path):
             mime_type, _ = mimetypes.guess_type(file_path)
             file_type = "document"
