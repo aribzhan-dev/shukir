@@ -26,9 +26,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = 'django-insecure-l2i*b6ygq8vfn6&h7sf5gwdwi5@wreh8oauvl9&b0kt8lt5ym!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["shukir.kz", "www.shukir.kz"]
+
+ALLOWED_HOSTS = []
 
 CSRF_TRUSTED_ORIGINS = [
     "https://shukir.kz",
@@ -127,18 +128,61 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # for django decoration
 JAZZMIN_SETTINGS = {
-    "site_title": "Shukir Admin",
-    "site_header": "Благотворительный фонд",
+    # 🔹 Основная информация
+    "site_title": "Shukir — Админ панель",
+    "site_header": "Shukir Благотворительный фонд",
     "site_brand": "Shukir",
+    "welcome_sign": "Добро пожаловать, администратор!",
+    "copyright": "© 2025 Designed by IThub",
+
+
     "site_logo": "img/shukir.jpeg",
     "site_logo_classes": "img-fluid",
-    "site_logo_width": 70,
-    "site_logo_height": 70,
-    "welcome_sign": "Добро пожаловать, admin!",
-    "copyright": "© 2025 Shukir Charity Foundation",
-    "show_ui_builder": True,
+    "site_logo_width": "180px",
+    "site_logo_height": "180px",
+    "site_brand_text": "Благотворительный фонд",
 
-    "theme": "flatly",  # boshqa variantlar: flatly, superhero, cosmo, simplex va h.k.
+
+    "login_logo": "img/shukir.jpeg",
+    "login_logo_classes": "img-fluid rounded",
+    "login_logo_width": "100px",
+    "login_logo_height": "100px",
+
+
+    "theme": "flatly",
+    "dark_mode_theme": None,
+    "show_ui_builder": False,
+
+
+    "navigation_expanded": False,
+    "hide_apps": [],
+    "hide_models": [],
+
+
+    "icons": {
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "main.HelpRequest": "fas fa-hand-holding-heart",
+        "main.HelpCategory": "fas fa-list",
+        "main.Translation": "fas fa-language",
+        "main.Language": "fas fa-globe",
+        "main.MaterialsStatus": "fas fa-ring",
+        "main.HelpRequestFile": "fas fa-file-upload",
+    },
+
+
+    "usermenu_links": [
+        {"name": "Перейти на сайт", "url": "https://shukir.kz", "new_window": True},
+        {"model": "auth.user"},
+    ],
+
+
+    "site_title_template": "Shukir | Администрирование",
+    "welcome_sign": "Добро пожаловать в панель управления!",
+    "show_sidebar": True,
+
+
+    "language_chooser": False,
 }
 
 # Default primary key field type
