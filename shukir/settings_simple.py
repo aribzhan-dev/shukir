@@ -26,15 +26,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = 'django-insecure-l2i*b6ygq8vfn6&h7sf5gwdwi5@wreh8oauvl9&b0kt8lt5ym!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["shukir.kz", "www.shukir.kz"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://shukir.kz",
     "https://www.shukir.kz",
 ]
-
 
 # Application definition
 
@@ -78,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shukir.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -88,7 +86,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -108,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -119,7 +115,6 @@ TIME_ZONE = 'Asia/Almaty'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -133,22 +128,18 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # for django decoration
 JAZZMIN_SETTINGS = {
     "site_title": "Shukir Admin",
-    "site_header": "Hayriya Fondi",
+    "site_header": "Благотворительный фонд",
     "site_brand": "Shukir",
     "site_logo": "img/shukir.jpeg",
     "site_logo_classes": "img-fluid",
     "site_logo_width": 70,
     "site_logo_height": 70,
-    "welcome_sign": "Xush kelibsiz, admin!",
+    "welcome_sign": "Добро пожаловать, admin!",
     "copyright": "© 2025 Shukir Charity Foundation",
     "show_ui_builder": True,
 
-
-    # Theme
     "theme": "flatly",  # boshqa variantlar: flatly, superhero, cosmo, simplex va h.k.
 }
-
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
