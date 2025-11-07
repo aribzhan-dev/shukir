@@ -30,18 +30,35 @@ class MaterialsStatusAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
+
+
 class UzbekCategoryFilter(admin.SimpleListFilter):
     title = "Категория помощи"
     parameter_name = "help_category_group"
 
     def lookups(self, request, model_admin):
+        lookups = []
+
+
         uz_cats = HelpCategory.objects.filter(language__code="uz").order_by("title")
-        return [(cat.group_key or f"id_{cat.id}", cat.title) for cat in uz_cats]
+        for cat in uz_cats:
+            if cat.group_key:
+                lookups.append((cat.group_key, cat.title))
+            else:
+                lookups.append((f"id_{cat.id}", cat.title))
+
+
+        lookups.append(("no_category", "Без категории"))
+        return lookups
 
     def queryset(self, request, queryset):
         value = self.value()
         if not value:
             return queryset
+
+        if value == "no_category":
+            return queryset.filter(help_category__isnull=True)
+
 
         if value.startswith("id_"):
             cat_id = int(value.split("_")[1])
@@ -81,8 +98,15 @@ class HelpRequestAdmin(admin.ModelAdmin):
     def help_category_display(self, obj):
         if not obj.help_category:
             return "—"
-        uz_cat = HelpCategory.objects.filter(group_key=obj.help_category.group_key, language__code="uz").first()
-        return uz_cat.title if uz_cat else obj.help_category.title
+
+        if obj.help_category.group_key:
+            uz_cat = HelpCategory.objects.filter(
+                group_key=obj.help_category.group_key, language__code="uz"
+            ).first()
+            if uz_cat:
+                return uz_cat.title
+        return obj.help_category.title
+
     help_category_display.short_description = "Категория помощи"
 
 
