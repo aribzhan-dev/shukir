@@ -4,6 +4,7 @@ from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCat
 import requests
 import os
 import mimetypes
+import re
 
 TELEGRAM_BOT_TOKEN = "8240282392:AAGtvnPfS3A0R6KQFydGXtBy1vuJ6VUuu9M"
 TELEGRAM_CHAT_ID = "-1003120018187"
@@ -13,24 +14,30 @@ def get_translations(lang_code):
     language = Language.objects.filter(code=lang_code, status=0).first()
     translations = {}
     if language:
-        qs = Translation.objects.filter(language=language, status=0)
-        for tr in qs:
+        for tr in Translation.objects.filter(language=language, status=0):
             translations[tr.key] = tr.value
     return translations
 
 
+def _clean_phone_for_wa(phone_str: str) -> str:
+    digits = re.sub(r"\D", "", str(phone_str or ""))
+
+    if len(digits) == 11 and digits.startswith("8"):
+        digits = "7" + digits[1:]
+    return digits
+
+
 @csrf_exempt
 def index_handler(request, lang_code="uz"):
-    languages = Language.objects.filter(status=0)
-    language = Language.objects.filter(code=lang_code).first()
-    if not language:
-        language = Language.objects.filter(code="uz").first()
 
+    languages = Language.objects.filter(status=0)
+    language = Language.objects.filter(code=lang_code).first() or Language.objects.filter(code="uz").first()
     translations = get_translations(lang_code)
     statuses = MaterialsStatus.objects.filter(language=language, status=0)
     categories = HelpCategory.objects.filter(status=0, language__code=lang_code)
 
     if request.method == "POST":
+
         name = request.POST.get("name")
         surname = request.POST.get("surname")
         age = request.POST.get("age")
@@ -44,8 +51,7 @@ def index_handler(request, lang_code="uz"):
         iin = request.POST.get("iin")
         reason = request.POST.get("why_need_help")
         received_help = request.POST.get("received_other_help") == "yes"
-        files = request.FILES.getlist('file')
-
+        files = request.FILES.getlist("file")
 
         material_status = MaterialsStatus.objects.filter(id=status_id).first()
         help_category = HelpCategory.objects.filter(id=category_id).first()
@@ -67,65 +73,75 @@ def index_handler(request, lang_code="uz"):
             status=0,
         )
 
+
         for f in files:
             HelpRequestFile.objects.create(help_request=help_request, file=f)
 
 
-        category_text = help_category.title
-        if help_category.is_other and other_category:
+        category_text = help_category.title if help_category else "-"
+        if help_category and getattr(help_category, "is_other", False) and other_category:
             category_text += f" ({other_category})"
 
+
+        wa_digits = _clean_phone_for_wa(help_request.phone_number)
+        wa_link = f"https://wa.me/{wa_digits}" if wa_digits else None
+        phone_html = (
+            f'<a href="{wa_link}">{help_request.phone_number}</a>' if wa_link else f"{help_request.phone_number}"
+        )
+
+
+        req_tag = f"HR-{help_request.id}"
         if lang_code == "ru":
             message = (
-                f"🟢 Поступила новая заявка на помощь:\n\n"
+                f"🟢 Поступила новая заявка на помощь {req_tag}:\n\n"
                 f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон: {help_request.phone_number}\n"
+                f"📞 Телефон: {phone_html}\n"
                 f"📅 Возраст: {help_request.age}\n"
                 f"👶 Количество детей: {help_request.child_in_fam}\n"
                 f"🏡 Адрес: {help_request.address}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
                 f"📂 Категория: {category_text}\n"
-                f"💬 Причина: {help_request.why_need_help}\n"
-                f"📦 Получал ли помощь ранее: {'Да' if help_request.received_other_help else 'Нет'}"
+                f"📦 Получал ли помощь ранее: {'Да' if help_request.received_other_help else 'Нет'}\n"
+                f"💬 Причина: {help_request.why_need_help}"
             )
         elif lang_code == "kk":
             message = (
-                f"🟢 Жаңа көмек сұрауы түсті:\n\n"
+                f"🟢 Жаңа көмек сұрауы түсті {req_tag}:\n\n"
                 f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон: {help_request.phone_number}\n"
+                f"📞 Телефон: {phone_html}\n"
                 f"📅 Жасы: {help_request.age}\n"
                 f"👶 Балалар саны: {help_request.child_in_fam}\n"
                 f"🏡 Мекенжай: {help_request.address}\n"
                 f"🆔 ЖСН: {help_request.iin}\n"
                 f"📂 Санат: {category_text}\n"
-                f"💬 Себебі: {help_request.why_need_help}\n"
-                f"📦 Бұрын көмек алған ба: {'Иә' if help_request.received_other_help else 'Жоқ'}"
+                f"📦 Бұрын көмек алған ба: {'Иә' if help_request.received_other_help else 'Жоқ'}\n"
+                f"💬 Себебі: {help_request.why_need_help}"
             )
         else:
             message = (
-                f"🟢 Янги ёрдам сўрови келди:\n\n"
+                f"🟢 Янги ёрдам сўрови келди {req_tag}:\n\n"
                 f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон рақами: {help_request.phone_number}\n"
+                f"📞 Телефон рақами: {phone_html}\n"
                 f"📅 Ёши: {help_request.age}\n"
                 f"👶 Фарзандлар сони: {help_request.child_in_fam}\n"
                 f"🏡 Манзил: {help_request.address}\n"
                 f"🆔 ИИН: {help_request.iin}\n"
                 f"📂 Тоифа: {category_text}\n"
-                f"💬 Сабаб: {help_request.why_need_help}\n"
-                f"📦 Илгари бошқа хайрия жамғармаларидан ёрдам олганми: {'Ҳа' if help_request.received_other_help else 'Йўқ'}"
+                f"📦 Илгари ёрдам олганми: {'Ҳа' if help_request.received_other_help else 'Йўқ'}\n"
+                f"💬 Сабаб: {help_request.why_need_help}"
             )
 
 
-        send_to_telegram(message)
+        send_to_telegram(text=message, parse_mode="HTML")
 
-        files = list(help_request.files.all())
-        total = len(files)
 
-        for index, f in enumerate(files, start=1):
+        files_qs = list(help_request.files.all())
+        total = len(files_qs)
+        for idx, f in enumerate(files_qs, start=1):
             try:
                 file_path = f.file.path
-                caption = f"📎 Файл {index} из {total} — {help_request.name} {help_request.surname}"
-                send_to_telegram(file_path=file_path, send_text_also=False, caption=caption)
+                caption = f"{req_tag} • Файл {idx}/{total} — {help_request.name} {help_request.surname}"
+                send_to_telegram(file_path=file_path, caption=caption, send_text_also=False)
             except Exception as e:
                 print(f"⚠️ Fayl yuborishda xatolik: {e}")
 
@@ -141,27 +157,23 @@ def index_handler(request, lang_code="uz"):
     return render(request, "index.html", context)
 
 
-
-
-
-
-def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=None):
+def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=None, parse_mode="HTML"):
     base_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
-
     try:
-
+        # Matn (faqat bir marta)
         if text and send_text_also:
             requests.post(
                 f"{base_url}/sendMessage",
                 data={
                     "chat_id": TELEGRAM_CHAT_ID,
                     "text": text,
-                    "parse_mode": "HTML",
+                    "parse_mode": parse_mode,
+                    "disable_web_page_preview": True,
                 },
                 timeout=10,
             )
 
-
+        # Fayl (mavjud bo‘lsa)
         if file_path and os.path.exists(file_path):
             mime_type, _ = mimetypes.guess_type(file_path)
             file_type = "document"
@@ -171,36 +183,26 @@ def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=Non
                 elif mime_type.startswith("video/"):
                     file_type = "video"
 
-            endpoint = {
-                "photo": "sendPhoto",
-                "video": "sendVideo",
-                "document": "sendDocument",
-            }[file_type]
+            endpoint = {"photo": "sendPhoto", "video": "sendVideo", "document": "sendDocument"}[file_type]
 
             with open(file_path, "rb") as f:
                 files = {file_type: f}
                 data = {"chat_id": TELEGRAM_CHAT_ID}
                 if caption:
                     data["caption"] = caption
+                    data["parse_mode"] = "HTML"
+                resp = requests.post(f"{base_url}/{endpoint}", data=data, files=files, timeout=60)
+                resp.raise_for_status()
+                print(f"📎 Fayl yuborildi: {os.path.basename(file_path)} — {resp.status_code}")
 
-                response = requests.post(
-                    f"{base_url}/{endpoint}",
-                    data=data,
-                    files=files,
-                    timeout=60,
-                )
-                response.raise_for_status()
-                print(f"📎 Fayl yuborildi: {os.path.basename(file_path)} — {response.status_code}")
-
+    except requests.exceptions.Timeout:
+        print("⏳ Telegram жавоб бермади (timeout).")
+    except requests.exceptions.ConnectionError:
+        print("⚠️ Интернет ёки Telegram API блокланган.")
     except Exception as e:
         print(f"❌ Telegram xatolik: {e}")
-
 
 
 def success_page(request, lang_code="uz"):
     translations = get_translations(lang_code)
     return render(request, "success.html", {"lang_code": lang_code, "tr": translations})
-
-
-
-

@@ -4,189 +4,203 @@
 <!DOCTYPE html>
 <html lang="{{ lang_code }}">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ "page_title"|translate:lang_code }}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{ "page_title"|translate:lang_code }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
 </head>
 <body>
 
-  <header class="main-header">
+<header class="main-header">
     <div class="header-overlay">
-      <div class="lang-container">
-        {% for lan in languages %}
-          <a href="/{{ lan.code }}/" class="lang-btn {% if lang_code == lan.code %}active{% endif %}">
-            {{ lan.title }}
-          </a>
-        {% endfor %}
-      </div>
+        <div class="lang-container">
+            {% for lan in languages %}
+                <a href="/{{ lan.code }}/" class="lang-btn {% if lang_code == lan.code %}active{% endif %}">
+                    {{ lan.title }}
+                </a>
+            {% endfor %}
+        </div>
     </div>
-  </header>
+</header>
 
-  <main>
+<main>
     <div class="form-container">
-      <div class="form-header">
-        <h3>{{ "form_title"|translate:lang_code }}</h3>
-        <p>{{ "form_subtitle"|translate:lang_code }}</p>
-      </div>
-
-      <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="row">
-          <div class="col">
-            <label>{{ "name_label"|translate:lang_code }} *</label>
-            <input type="text" name="name" required placeholder="{{ 'name_placeholder'|translate:lang_code }}" />
-          </div>
-          <div class="col">
-            <label>{{ "surname_label"|translate:lang_code }} *</label>
-            <input type="text" name="surname" required placeholder="{{ 'surname_placeholder'|translate:lang_code }}" />
-          </div>
+        <div class="form-header">
+            <h3>{{ "form_title"|translate:lang_code }}</h3>
+            <p>{{ "form_subtitle"|translate:lang_code }}</p>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <label>{{ "age_label"|translate:lang_code }} *</label>
-            <input type="number" name="age" required placeholder="{{ 'age_placeholder'|translate:lang_code }}" />
-          </div>
-          <div class="col">
-            <label>{{ "iin_label"|translate:lang_code }} *</label>
-            <input type="text" name="iin" required placeholder="{{ 'iin_placeholder'|translate:lang_code }}" />
-          </div>
-        </div>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <div class="row">
-          <div class="col">
-            <label>{{ "phone_label"|translate:lang_code }} *</label>
-            <input type="tel" name="phone_number" placeholder="{{ 'phone_placeholder'|translate:lang_code }}" required />
-          </div>
-            <div class="col">
-              <label>{{ "children_label"|translate:lang_code }} *</label>
-              <div class="counter-container">
-                <button type="button" class="counter-btn" onclick="decreaseCount()">−</button>
-                <input type="number" id="childCount" name="child_in_fam" value="0" min="0" required />
-                <button type="button" class="counter-btn" onclick="increaseCount()">+</button>
-              </div>
+            <div class="row">
+                <div class="col">
+                    <label>{{ "name_label"|translate:lang_code }} *</label>
+                    <input type="text" name="name" required oninput="validateLetters(this)"
+                           placeholder="{{ 'name_placeholder'|translate:lang_code }}"/>
+                </div>
+                <div class="col">
+                    <label>{{ "surname_label"|translate:lang_code }} *</label>
+                    <input type="text" name="surname" required oninput="validateLetters(this)"
+                           placeholder="{{ 'surname_placeholder'|translate:lang_code }}"/>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-          <div class="col full">
-            <label>{{ "status_label"|translate:lang_code }} *</label>
-            <select name="material_status" required>
-              <option value="">{{ "choose_status"|translate:lang_code }}</option>
-              {% for status in statuses %}
-                <option value="{{ status.id }}">{{ status.title }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col full">
-            <label>{{ "help_category_label"|translate:lang_code }} *</label>
-            <select name="help_category" id="helpCategory" required onchange="toggleOtherCategory(this)">
-              <option value="">{{ "choose_category"|translate:lang_code }}</option>
-              {% for category in categories %}
-                <option value="{{ category.id }}" data-is-other="{{ category.is_other|yesno:'true,false' }}">
-                  {{ category.title }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="row" id="otherCategoryRow" style="display:none;">
-          <div class="col full">
-            <label>{{ "other_category_label"|translate:lang_code }}</label>
-            <input type="text" name="other_category" placeholder="{{ 'enter_other_category'|translate:lang_code }}" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col full">
-            <label>{{ "received_other_help_label"|translate:lang_code }} *</label>
-            <div class="radio-group">
-              <label>
-                <input type="radio" name="received_other_help" value="yes" required>
-                {{ "yes_option"|translate:lang_code }}
-              </label>
-              <label>
-                <input type="radio" name="received_other_help" value="no" required>
-                {{ "no_option"|translate:lang_code }}
-              </label>
+            <div class="row">
+                <div class="col">
+                    <label>{{ "age_label"|translate:lang_code }} *</label>
+                    <input type="number" name="age" required oninput="validateAge(this, true)" inputmode="numeric"
+                           pattern="[0-9]*" placeholder="{{ 'age_placeholder'|translate:lang_code }}"/>
+                </div>
+                <div class="col">
+                    <label>{{ "iin_label"|translate:lang_code }} *</label>
+                    <input type="text" name="iin" required inputmode="numeric" pattern="^\d{12}$" maxlength="12"
+                           oninput="this.value = this.value.replace(/\D/g,'').slice(0,12);"/>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col full">
-            <label>{{ "file_upload_label"|translate:lang_code }} *</label>
-            <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
-
-            <div class="upload-box" onclick="document.getElementById('file').click()">
-              <input
-                type="file"
-                id="file"
-                name="file"
-                accept="image/*,.pdf" multiple required hidden="" onchange="showFileName()" />
-              <div class="upload-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="70" height="70" fill="none" stroke="#6ad48c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 16l-4-4-4 4"></path>
-                  <path d="M12 12v9"></path>
-                  <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"></path>
-                </svg>
-              </div>
-              <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
-              <p class="upload-hint">{{ "file_upload_info"|translate:lang_code }}</p>
+            <div class="row">
+                <div class="col">
+                    <label>{{ "phone_label"|translate:lang_code }} *</label>
+                    <input type="tel" name="phone_number" id="phoneInput" placeholder="+7 (___) ___-__-__" required
+                           inputmode="tel" pattern="^\+?\d{10,15}$" maxlength="18"
+                           oninput="this.value = this.value.replace(/[^\d+]/g, '').replace(/(?!^)\+/g,'');"/>
+                </div>
+                <div class="col">
+                    <label>{{ "children_label"|translate:lang_code }} *</label>
+                    <div class="counter-container">
+                        <button type="button" class="counter-btn" onclick="decreaseCount()">−</button>
+                        <input type="number" id="childCount" name="child_in_fam" value="0" min="0" required inputmode="numeric" oninput="validateAge(this, false)" />
+                        <button type="button" class="counter-btn" onclick="increaseCount()">+</button>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col full">
-            <label>{{ "address_label"|translate:lang_code }} *</label>
-            <input type="text" name="address" required placeholder="{{ 'address_placeholder'|translate:lang_code }}" />
-          </div>
-        </div>
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "status_label"|translate:lang_code }} *</label>
+                    <select name="material_status" required>
+                        <option value="">{{ "choose_status"|translate:lang_code }}</option>
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}">{{ status.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-        <div class="row">
-          <div class="col full">
-            <label>{{ "reason_label"|translate:lang_code }} *</label>
-            <textarea name="why_need_help" required placeholder="{{ 'reason_placeholder'|translate:lang_code }}"></textarea>
-          </div>
-        </div>
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "help_category_label"|translate:lang_code }} *</label>
+                    <select name="help_category" id="helpCategory" required onchange="toggleOtherCategory(this)">
+                        <option value="">{{ "choose_category"|translate:lang_code }}</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}"
+                                    data-is-other="{{ category.is_other|yesno:'true,false' }}">
+                                {{ category.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-        <button type="submit" class="submit-btn">{{ "submit_button"|translate:lang_code }}</button>
-      </form>
+            <div class="row" id="otherCategoryRow" style="display:none;">
+                <div class="col full">
+                    <label>{{ "other_category_label"|translate:lang_code }}</label>
+                    <input type="text" name="other_category"
+                           placeholder="{{ 'enter_other_category'|translate:lang_code }}"/>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "received_other_help_label"|translate:lang_code }} *</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="received_other_help" value="yes" required>
+                            {{ "yes_option"|translate:lang_code }}
+                        </label>
+                        <label>
+                            <input type="radio" name="received_other_help" value="no" required>
+                            {{ "no_option"|translate:lang_code }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "file_upload_label"|translate:lang_code }} *</label>
+                    <p class="upload-desc">{{ "file_upload_desc"|translate:lang_code }}</p>
+
+                    <div class="upload-box" onclick="document.getElementById('file').click()">
+                        <input
+                                type="file"
+                                id="file"
+                                name="file"
+                                accept="image/*,.pdf" multiple required hidden="" onchange="showFileName()"/>
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="70" height="70"
+                                 fill="none" stroke="#6ad48c" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M16 16l-4-4-4 4"></path>
+                                <path d="M12 12v9"></path>
+                                <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"></path>
+                            </svg>
+                        </div>
+                        <p class="upload-text" id="uploadText">{{ "file_upload_btn"|translate:lang_code }}</p>
+                        <p class="upload-hint">{{ "file_upload_info"|translate:lang_code }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "address_label"|translate:lang_code }} *</label>
+                    <input type="text" name="address" required
+                           placeholder="{{ 'address_placeholder'|translate:lang_code }}"/>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col full">
+                    <label>{{ "reason_label"|translate:lang_code }} *</label>
+                    <textarea name="why_need_help" required
+                              placeholder="{{ 'reason_placeholder'|translate:lang_code }}"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">{{ "submit_button"|translate:lang_code }}</button>
+        </form>
     </div>
-  </main>
+</main>
 
-  <footer>
+<footer>
     <p>© 2025 {{ "footer_text"|translate:lang_code }}</p>
-  </footer>
+</footer>
 
-  <script>
+<script>
     function toggleOtherCategory(select) {
-      const selectedOption = select.options[select.selectedIndex];
-      const isOther = selectedOption.getAttribute('data-is-other') === 'true';
-      document.getElementById('otherCategoryRow').style.display = isOther ? 'block' : 'none';
+        const selectedOption = select.options[select.selectedIndex];
+        const isOther = selectedOption.getAttribute('data-is-other') === 'true';
+        document.getElementById('otherCategoryRow').style.display = isOther ? 'block' : 'none';
     }
-    function showFileName() {
-      const input = document.getElementById('file');
-      const text = document.getElementById('uploadText');
 
-      if (input.files.length > 0) {
-        const fileNames = Array.from(input.files).map(f => f.name);
-        let displayText = fileNames.join(', ');
-        if (displayText.length > 50) displayText = displayText.slice(0, 47) + '...';
-        text.textContent = displayText;
-        text.style.color = "#222";
-      } else {
-        text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
-        text.style.color = "#666";
-      }
+    function showFileName() {
+        const input = document.getElementById('file');
+        const text = document.getElementById('uploadText');
+
+        if (input.files.length > 0) {
+            const fileNames = Array.from(input.files).map(f => f.name);
+            let displayText = fileNames.join(', ');
+            if (displayText.length > 50) displayText = displayText.slice(0, 47) + '...';
+            text.textContent = displayText;
+            text.style.color = "#222";
+        } else {
+            text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
+            text.style.color = "#666";
+        }
     }
+
     function increaseCount() {
         const input = document.getElementById('childCount');
         input.value = parseInt(input.value || 0) + 1;
@@ -197,6 +211,76 @@
         const current = parseInt(input.value || 0);
         if (current > 0) input.value = current - 1;
     }
-  </script>
+
+    function validateLetters(input) {
+        input.value = input.value.replace(/[^A-Za-zА-Яа-яЁё\s]/g, "");
+    }
+
+    function validateAge(input, is_age = false) {
+        let value = input.value;
+        value = value.replace(/[eEpP\+\-\.]/g, "");
+        value = value.replace(/[^0-9]/g, "");
+
+        if (is_age && value.startsWith("0")) {
+            value = value.replace(/^0+/, "");
+        }
+
+        if (value.length > 3) {
+            value = value.slice(0, 3);
+        }
+        input.value = value;
+    }
+
+  const phoneInput = document.getElementById("phoneInput");
+
+  phoneInput.addEventListener("focus", addPrefix);
+  phoneInput.addEventListener("blur", removeEmptyPrefix);
+  phoneInput.addEventListener("input", formatPhone);
+  phoneInput.addEventListener("keydown", handleBackspace);
+
+  function addPrefix() {
+    if (!phoneInput.value.startsWith("+7")) {
+      phoneInput.value = "+7 ";
+    }
+  }
+
+  function removeEmptyPrefix() {
+    if (phoneInput.value === "+7 ") {
+      phoneInput.value = "";
+    }
+  }
+
+  function handleBackspace(e) {
+
+    if (e.key === "Backspace") {
+      let pos = phoneInput.selectionStart;
+      let val = phoneInput.value;
+
+
+      if (pos && /[\s\-\)\(]/.test(val[pos - 1])) {
+        e.preventDefault();
+        phoneInput.setSelectionRange(pos - 1, pos - 1);
+        let before = val.slice(0, pos - 1);
+        let after = val.slice(pos);
+        phoneInput.value = before + after;
+        formatPhone();
+      }
+    }
+  }
+
+  function formatPhone() {
+    let value = phoneInput.value.replace(/\D/g, "");
+    if (!value.startsWith("7")) value = "7" + value;
+
+    let formatted = "+7";
+    if (value.length > 1) formatted += " (" + value.substring(1, 4);
+    if (value.length >= 4) formatted += ")";
+    if (value.length >= 5) formatted += " " + value.substring(4, 7);
+    if (value.length >= 7) formatted += "-" + value.substring(7, 9);
+    if (value.length >= 9) formatted += "-" + value.substring(9, 11);
+
+    phoneInput.value = formatted;
+  }
+</script>
 </body>
 </html>
