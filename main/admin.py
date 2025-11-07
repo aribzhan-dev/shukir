@@ -28,6 +28,9 @@ class MaterialsStatusAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
+from django.db.models import Count
+from django.utils.html import format_html
+
 
 @admin.register(HelpRequest)
 class HelpRequestAdmin(admin.ModelAdmin):
@@ -41,78 +44,64 @@ class HelpRequestAdmin(admin.ModelAdmin):
         "status",
         "whatsapp_link",
     )
-    list_filter = (
-        "help_category",
-        "received_other_help",
-        "status",
-    )
+    list_filter = ("help_category", "received_other_help", "status")
     search_fields = ("name", "surname", "iin", "phone_number", "address")
     list_per_page = 30
     ordering = ("-id",)
     change_list_template = "admin/help_request_changelist.html"
 
-
     def received_other_help_display(self, obj):
         return "Да" if obj.received_other_help else "Нет"
-    received_other_help_display.short_description = "Получал помощь ранее"
 
+    received_other_help_display.short_description = "Получал помощь ранее"
 
     def whatsapp_link(self, obj):
         if not obj.phone_number:
             return "—"
-
-        phone = str(obj.phone_number)
-        clean_phone = (
-            phone.replace("+", "")
+        phone = (
+            str(obj.phone_number)
+            .replace("+", "")
             .replace(" ", "")
             .replace("-", "")
             .replace("(", "")
             .replace(")", "")
         )
-        wa_url = f"https://wa.me/{clean_phone}"
-
+        wa_url = f"https://wa.me/{phone}"
         return format_html(
             '<a href="{}" target="_blank" '
-            'style="background-color:#007bff;color:white;'
+            'style="background-color:#28a745;color:white;'
             'padding:3px 10px;border-radius:6px;'
-            'text-decoration:none;font-weight:bold;"> WhatsApp</a>',
+            'text-decoration:none;font-weight:bold;">WhatsApp</a>',
             wa_url,
         )
+
     whatsapp_link.short_description = "Связаться в WhatsApp"
 
-
-
     def changelist_view(self, request, extra_context=None):
-
         extra_context = extra_context or {}
         queryset = self.get_queryset(request)
-
 
         total_requests = queryset.count()
         total_received_help = queryset.filter(received_other_help=True).count()
         total_not_received_help = queryset.filter(received_other_help=False).count()
 
+        merged = {}
+        all_cats = HelpCategory.objects.all()
 
-        category_counts = (
-            queryset.values("help_category_id")
-            .annotate(total=Count("id"))
-            .order_by("-total")
-        )
+        for uz_cat in all_cats.filter(language__code="uz"):
+            related_ids = list(all_cats.filter(group_key=uz_cat.group_key).values_list("id", flat=True))
+            count = queryset.filter(help_category_id__in=related_ids).count()
+            if count > 0:
+                merged[uz_cat.title] = count
 
+        no_cat_count = queryset.filter(help_category__isnull=True).count()
+        if no_cat_count > 0:
+            merged["Без категории"] = no_cat_count
 
-        merged_categories = []
-        for c in category_counts:
-            cat_id = c["help_category_id"]
-            if cat_id:
-                category_obj = HelpCategory.objects.filter(id=cat_id).first()
-                title = category_obj.title if category_obj else "Без категории"
-            else:
-                title = "Без категории"
-
-            merged_categories.append({
-                "title": title,
-                "total": c["total"],
-            })
+        merged_categories = [
+            {"title": title, "total": total}
+            for title, total in sorted(merged.items(), key=lambda x: -x[1])
+        ]
 
         extra_context["summary"] = {
             "total": total_requests,

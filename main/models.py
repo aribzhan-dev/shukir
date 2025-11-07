@@ -48,6 +48,7 @@ class HelpCategory(models.Model):
     title = models.CharField(max_length=250, verbose_name="Название категории помощи")
     language = models.ForeignKey(Language, on_delete=models.CASCADE, blank=True, null=True)
     is_other = models.BooleanField(default=False, verbose_name="Является 'Другое'")
+    group_key = models.CharField(max_length=100, blank=True, null=True, verbose_name="Группа категории")
     status = models.IntegerField(default=0, verbose_name="Статус")
 
     def __str__(self):
@@ -97,26 +98,39 @@ class HelpRequestFile(models.Model):
         return f"{self.file.name}"
 
 
+from django.db import models
+from django.utils import timezone
+
 class Employee(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    status = models.IntegerField(default=0)
+    first_name = models.CharField(max_length=100, verbose_name="Имя сотрудника")
+    last_name = models.CharField(max_length=100, verbose_name="Фамилия сотрудника")
+    status = models.IntegerField(default=0, verbose_name="Статус")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    class Meta:
+        verbose_name = "Сотрудник"
+        verbose_name_plural = "Сотрудники"
+
+
 class Archive(models.Model):
-    help_request = models.ForeignKey(HelpRequest, on_delete=models.CASCADE, blank=True, null=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, blank=True, null=True)
-    help_category = models.ForeignKey(HelpCategory, on_delete=models.CASCADE)
-    money = models.DecimalField(default=0.00, max_digits=20, decimal_places=2)
-    desc = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    status = models.IntegerField(default=0)
+    help_request = models.ForeignKey('HelpRequest', on_delete=models.CASCADE, blank=True, null=True, verbose_name="Заявка на помощь")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Ответственный сотрудник")
+    help_category = models.ForeignKey('HelpCategory', on_delete=models.CASCADE, verbose_name="Категория помощи")
+    money = models.DecimalField( default=0.00, max_digits=20, decimal_places=2, verbose_name="Выделенная сумма")
+    desc = models.TextField(blank=True, null=True, verbose_name="Комментарий")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
+    status = models.IntegerField(default=0, verbose_name="Статус")
 
     def __str__(self):
-        return f"{self.employee.first_name} {self.employee.last_name}"
+        if self.employee:
+            return f"{self.employee.first_name} {self.employee.last_name}"
+        return f"Архив №{self.id}"
 
+    class Meta:
+        verbose_name = "Архив помощи"
+        verbose_name_plural = "Архив помощи"
 
 
 

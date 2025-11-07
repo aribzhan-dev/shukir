@@ -1,139 +1,142 @@
 {% extends "admin/change_list.html" %}
 {% block content %}
-<style>
-  .stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    align-items: flex-start;
-    margin-bottom: 30px;
-  }
+    <style>
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
 
-  .stats-card {
-    background: linear-gradient(135deg, #f7fafc, #edf2f7);
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    padding: 20px 25px;
-    flex: 1;
-    min-width: 280px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-  }
+        .stats-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 20px 25px;
+            flex: 1;
+            min-width: 280px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
 
-  .stats-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-  }
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        }
 
-  .stats-card h2 {
-    font-size: 22px;
-    margin-bottom: 10px;
-    color: #1a365d;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+        .stats-card h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #1a365d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-  .stats-card h2::before {
-    content: "📊";
-    font-size: 22px;
-  }
+        .stats-card h2::before {
 
-  .stats-list {
-    line-height: 1.8;
-    font-size: 15px;
-    color: #2d3748;
-  }
+            font-size: 22px;
+        }
 
-  .category-table-container {
-    flex: 2;
-  }
+        .stats-list {
+            line-height: 1.8;
+            font-size: 15px;
+            color: #2d3748;
+        }
 
-  .category-table-container h3 {
-    font-size: 20px;
-    margin-bottom: 12px;
-    color: #2b6cb0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+        .category-table-container {
+            flex: 2;
+        }
 
-  .category-table-container h3::before {
-    content: "📂";
-    font-size: 22px;
-  }
+        .category-table-container h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #2b6cb0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-  table.stats-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #cbd5e0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
+        .category-table-container h3::before {
 
-  table.stats-table th {
-    background: #ebf8ff;
-    color: #2b6cb0;
-    text-align: left;
-    font-weight: 700;
-    padding: 10px 12px;
-    border-bottom: 2px solid #cbd5e0;
-  }
+            font-size: 22px;
+        }
 
-  table.stats-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 15px;
-  }
+        table.stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-  table.stats-table tr:hover td {
-    background-color: #f7fafc;
-  }
+        table.stats-table th {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            text-align: left;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 2px solid #cbd5e0;
+        }
 
-  .total-highlight {
-    font-weight: bold;
-    color: #1a202c;
-  }
+        table.stats-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 15px;
+        }
 
-  @media (max-width: 768px) {
-    .stats-container {
-      flex-direction: column;
-    }
-  }
-</style>
+        table.stats-table tr:hover td {
+            background-color: #f7fafc;
+        }
 
-<div class="stats-container">
-  <div class="stats-card">
-    <h2>Статистика по заявкам</h2>
-    <div class="stats-list">
-      <p><strong>Всего заявок:</strong> {{ summary.total }}</p>
-      <p><strong>Получали помощь ранее:</strong> {{ summary.received }}</p>
-      <p><strong>Не получали помощь ранее:</strong> {{ summary.not_received }}</p>
+        .total-highlight {
+            font-weight: bold;
+            color: #1a202c;
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <div class="stats-container">
+        <div class="stats-card">
+            <h2>Статистика по заявкам</h2>
+            <div class="stats-list">
+                <p><strong>Всего заявок:</strong> {{ summary.total }}</p>
+                <p><strong>Получали помощь ранее:</strong> {{ summary.received }}</p>
+                <p><strong>Не получали помощь ранее:</strong> {{ summary.not_received }}</p>
+            </div>
+        </div>
+
+        <div class="category-table-container">
+            <h3>По категориям</h3>
+            <table class="stats-table">
+                <thead>
+                <tr>
+                    <th>Категория</th>
+                    <th>Количество заявок</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in summary.categories %}
+                    <tr>
+                        <td>{% if c.title %}{{ c.title }}{% else %}
+                            <span style="color:#999">Без категории</span>{% endif %}</td>
+                        <td class="total-highlight">{{ c.total }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align:center;">Нет данных</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 
-  <div class="category-table-container">
-    <h3>По категориям</h3>
-    <table class="stats-table">
-      <thead>
-        <tr>
-          <th>Категория</th>
-          <th>Количество заявок</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in summary.categories %}
-        <tr>
-          <td>{{ c.help_category__title|default:"—" }}</td>
-          <td class="total-highlight">{{ c.total }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="2" style="text-align:center;">Нет данных</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-{{ block.super }}
+    {{ block.super }}
 {% endblock %}
