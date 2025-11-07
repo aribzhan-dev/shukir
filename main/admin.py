@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.db.models import Count
+from django.db.models import OuterRef, Exists, Q
 from main.models import (
     Language, Translation, MaterialsStatus,
-    HelpRequest, HelpCategory, HelpRequestFile
+    HelpRequest, HelpCategory, HelpRequestFile,
+    Employee, Archive
 )
 from django.utils.html import format_html
 
@@ -28,8 +30,26 @@ class MaterialsStatusAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
-from django.db.models import Count
-from django.utils.html import format_html
+class UzbekCategoryFilter(admin.SimpleListFilter):
+    title = "Категория помощи"
+    parameter_name = "help_category_group"
+
+    def lookups(self, request, model_admin):
+        uz_cats = HelpCategory.objects.filter(language__code="uz").order_by("title")
+        return [(cat.group_key or f"id_{cat.id}", cat.title) for cat in uz_cats]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if not value:
+            return queryset
+
+        if value.startswith("id_"):
+            cat_id = int(value.split("_")[1])
+            return queryset.filter(help_category_id=cat_id)
+
+        related_ids = HelpCategory.objects.filter(group_key=value).values_list("id", flat=True)
+        return queryset.filter(help_category_id__in=related_ids)
+
 
 
 @admin.register(HelpRequest)
@@ -49,6 +69,23 @@ class HelpRequestAdmin(admin.ModelAdmin):
     list_per_page = 30
     ordering = ("-id",)
     change_list_template = "admin/help_request_changelist.html"
+
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        archived = Archive.objects.filter(help_request=OuterRef("pk"))
+        return qs.annotate(is_archived=Exists(archived)).filter(is_archived=False)
+
+
+    def help_category_display(self, obj):
+        if not obj.help_category:
+            return "—"
+        uz_cat = HelpCategory.objects.filter(group_key=obj.help_category.group_key, language__code="uz").first()
+        return uz_cat.title if uz_cat else obj.help_category.title
+    help_category_display.short_description = "Категория помощи"
+
+
 
     def received_other_help_display(self, obj):
         return "Да" if obj.received_other_help else "Нет"
@@ -124,3 +161,66 @@ class TranslationAdmin(admin.ModelAdmin):
     list_display = ("key", "language", "value")
     list_filter = ("language",)
     search_fields = ("key", "value")
+
+
+
+@admin.register(Employee)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ("id", "first_name", "last_name", "status_display")
+    search_fields = ("first_name", "last_name")
+    list_filter = ("status",)
+    ordering = ("-id",)
+    list_per_page = 30
+
+    def status_display(self, obj):
+        return "Активен" if obj.status == 0 else "Неактивен"
+    status_display.short_description = "Статус"
+
+
+@admin.register(Archive)
+class ArchiveAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "help_request_display",
+        "employee_display",
+        "help_category_display",
+        "money",
+        "created_at",
+        "status_display",
+    )
+    list_filter = ("help_category", "status", "employee")
+    search_fields = (
+        "help_request__name",
+        "help_request__surname",
+        "employee__first_name",
+        "employee__last_name",
+        "help_category__title",
+    )
+    readonly_fields = ("created_at",)
+    autocomplete_fields = ("help_request", "employee", "help_category")
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    def help_request_display(self, obj):
+        if not obj.help_request:
+            return "—"
+        return f"{obj.help_request.name} {obj.help_request.surname}"
+    help_request_display.short_description = "Заявитель"
+
+    def employee_display(self, obj):
+        return f"{obj.employee.first_name} {obj.employee.last_name}" if obj.employee else "—"
+    employee_display.short_description = "Ответственный сотрудник"
+
+    def help_category_display(self, obj):
+        return obj.help_category.title if obj.help_category else "—"
+    help_category_display.short_description = "Категория помощи"
+
+    def status_display(self, obj):
+        if obj.status == 0:
+            return "Новая"
+        elif obj.status == 1:
+            return "Одобрена"
+        elif obj.status == 2:
+            return "Отклонена"
+        return "Неизвестно"
+    status_display.short_description = "Статус"

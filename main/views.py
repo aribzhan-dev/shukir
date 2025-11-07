@@ -82,54 +82,73 @@ def index_handler(request, lang_code="uz"):
         if help_category and getattr(help_category, "is_other", False) and other_category:
             category_text += f" ({other_category})"
 
+        status_text = material_status.title if material_status else "-"
 
         wa_digits = _clean_phone_for_wa(help_request.phone_number)
         wa_link = f"https://wa.me/{wa_digits}" if wa_digits else None
-        phone_html = (
-            f'<a href="{wa_link}">{help_request.phone_number}</a>' if wa_link else f"{help_request.phone_number}"
-        )
-
+        phone_html = f'<a href="{wa_link}">{help_request.phone_number}</a>' if wa_link else f"{help_request.phone_number}"
 
         req_tag = f"HR-{help_request.id}"
-        if lang_code == "ru":
-            message = (
-                f"🟢 Поступила новая заявка на помощь {req_tag}:\n\n"
-                f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон: {phone_html}\n"
-                f"📅 Возраст: {help_request.age}\n"
-                f"👶 Количество детей: {help_request.child_in_fam}\n"
-                f"🏡 Адрес: {help_request.address}\n"
-                f"🆔 ИИН: {help_request.iin}\n"
-                f"📂 Категория: {category_text}\n"
-                f"📦 Получал ли помощь ранее: {'Да' if help_request.received_other_help else 'Нет'}\n"
-                f"💬 Причина: {help_request.why_need_help}"
-            )
-        elif lang_code == "kk":
-            message = (
-                f"🟢 Жаңа көмек сұрауы түсті {req_tag}:\n\n"
-                f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон: {phone_html}\n"
-                f"📅 Жасы: {help_request.age}\n"
-                f"👶 Балалар саны: {help_request.child_in_fam}\n"
-                f"🏡 Мекенжай: {help_request.address}\n"
-                f"🆔 ЖСН: {help_request.iin}\n"
-                f"📂 Санат: {category_text}\n"
-                f"📦 Бұрын көмек алған ба: {'Иә' if help_request.received_other_help else 'Жоқ'}\n"
-                f"💬 Себебі: {help_request.why_need_help}"
-            )
-        else:
-            message = (
-                f"🟢 Янги ёрдам сўрови келди {req_tag}:\n\n"
-                f"👤 {help_request.name} {help_request.surname}\n"
-                f"📞 Телефон рақами: {phone_html}\n"
-                f"📅 Ёши: {help_request.age}\n"
-                f"👶 Фарзандлар сони: {help_request.child_in_fam}\n"
-                f"🏡 Манзил: {help_request.address}\n"
-                f"🆔 ИИН: {help_request.iin}\n"
-                f"📂 Тоифа: {category_text}\n"
-                f"📦 Илгари ёрдам олганми: {'Ҳа' if help_request.received_other_help else 'Йўқ'}\n"
-                f"💬 Сабаб: {help_request.why_need_help}"
-            )
+
+
+        text_labels = {
+            "uz": {
+                "new_request": "🟢 Янги ёрдам сўрови келди",
+                "age": "Ёши",
+                "family": "Оилавий ҳолати",
+                "children": "Фарзандлар сони",
+                "address": "Манзил",
+                "iin": "ИИН",
+                "category": "Тоифа",
+                "received": "Илгари ёрдам олганми",
+                "reason": "Сабаб",
+                "yes": "Ҳа",
+                "no": "Йўқ",
+            },
+            "ru": {
+                "new_request": "🟢 Поступила новая заявка на помощь",
+                "age": "Возраст",
+                "family": "Семейное положение",
+                "children": "Количество детей",
+                "address": "Адрес",
+                "iin": "ИИН",
+                "category": "Категория",
+                "received": "Получал ли помощь ранее",
+                "reason": "Причина",
+                "yes": "Да",
+                "no": "Нет",
+            },
+            "kk": {
+                "new_request": "🟢 Жаңа көмек сұрауы түсті",
+                "age": "Жасы",
+                "family": "Отбасылық жағдайы",
+                "children": "Балалар саны",
+                "address": "Мекенжай",
+                "iin": "ЖСН",
+                "category": "Санат",
+                "received": "Бұрын көмек алған ба",
+                "reason": "Себебі",
+                "yes": "Иә",
+                "no": "Жоқ",
+            },
+        }
+
+        lbl = text_labels.get(lang_code, text_labels["uz"])
+
+
+        message = (
+            f"{lbl['new_request']} {req_tag}:\n\n"
+            f"👤 {help_request.name} {help_request.surname}\n"
+            f"📞 Телефон: {phone_html}\n"
+            f"📅 {lbl['age']}: {help_request.age}\n"
+            f"🏠 {lbl['family']}: {status_text}\n"
+            f"👶 {lbl['children']}: {help_request.child_in_fam}\n"
+            f"🏡 {lbl['address']}: {help_request.address}\n"
+            f"🆔 {lbl['iin']}: {help_request.iin}\n"
+            f"📂 {lbl['category']}: {category_text}\n"
+            f"📦 {lbl['received']}: {lbl['yes'] if help_request.received_other_help else lbl['no']}\n"
+            f"💬 {lbl['reason']}: {help_request.why_need_help}"
+        )
 
 
         send_to_telegram(text=message, parse_mode="HTML")
@@ -160,7 +179,7 @@ def index_handler(request, lang_code="uz"):
 def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=None, parse_mode="HTML"):
     base_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
     try:
-        # Matn (faqat bir marta)
+
         if text and send_text_also:
             requests.post(
                 f"{base_url}/sendMessage",
@@ -173,7 +192,7 @@ def send_to_telegram(text=None, file_path=None, send_text_also=True, caption=Non
                 timeout=10,
             )
 
-        # Fayl (mavjud bo‘lsa)
+
         if file_path and os.path.exists(file_path):
             mime_type, _ = mimetypes.guess_type(file_path)
             file_type = "document"
