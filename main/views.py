@@ -53,6 +53,12 @@ def index_handler(request, lang_code="uz"):
         received_help = request.POST.get("received_other_help") == "yes"
         files = request.FILES.getlist("file")
 
+        if phone:
+            phone = re.sub(r"\D", "", phone)
+            if phone.startswith("8"):
+                phone = "7" + phone[1:]
+            phone = "+" + phone
+
         material_status = MaterialsStatus.objects.filter(id=status_id).first()
         help_category = HelpCategory.objects.filter(id=category_id).first()
 

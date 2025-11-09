@@ -7,6 +7,11 @@ from main.models import (
     Employee, Archive
 )
 from django.utils.html import format_html
+from datetime import datetime
+from django.utils.translation import gettext_lazy as _
+
+
+
 
 
 @admin.register(Language)
@@ -201,18 +206,44 @@ class EmployeeAdmin(admin.ModelAdmin):
     status_display.short_description = "Статус"
 
 
+
+class DateRangeFilter(admin.SimpleListFilter):
+    title = _("Дата создания (интервал)")
+    parameter_name = "created_range"
+    template = "admin/date_range_filter.html"
+
+    def lookups(self, request, model_admin):
+        return (("custom", "Диапазон"),)
+
+    def queryset(self, request, queryset):
+        start_date = request.GET.get("start_date", "").strip()
+        end_date = request.GET.get("end_date", "").strip()
+
+        if start_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            except ValueError:
+                start_date = None
+
+        if end_date:
+            try:
+                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+            except ValueError:
+                end_date = None
+
+        if start_date and end_date:
+            return queryset.filter(created_at__date__range=(start_date, end_date))
+        elif start_date:
+            return queryset.filter(created_at__date__gte=start_date)
+        elif end_date:
+            return queryset.filter(created_at__date__lte=end_date)
+        return queryset
+
+
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "help_request_display",
-        "employee_display",
-        "help_category_display",
-        "money",
-        "created_at",
-        "status_display",
-    )
-    list_filter = ("help_category", "status", "employee")
+    list_display = ("id", "help_category", "money", "created_at", "status")
+    list_filter = (DateRangeFilter,)
     search_fields = (
         "help_request__name",
         "help_request__surname",
@@ -221,14 +252,11 @@ class ArchiveAdmin(admin.ModelAdmin):
         "help_category__title",
     )
     readonly_fields = ("created_at",)
-    autocomplete_fields = ("help_request", "employee", "help_category")
     ordering = ("-created_at",)
     list_per_page = 30
 
     def help_request_display(self, obj):
-        if not obj.help_request:
-            return "—"
-        return f"{obj.help_request.name} {obj.help_request.surname}"
+        return f"{obj.help_request.name} {obj.help_request.surname}" if obj.help_request else "—"
     help_request_display.short_description = "Заявитель"
 
     def employee_display(self, obj):
@@ -236,7 +264,17 @@ class ArchiveAdmin(admin.ModelAdmin):
     employee_display.short_description = "Ответственный сотрудник"
 
     def help_category_display(self, obj):
-        return obj.help_category.title if obj.help_category else "—"
+        if not obj.help_category:
+            return "—"
+
+        if obj.help_category.group_key:
+            uz_cat = HelpCategory.objects.filter(
+                group_key=obj.help_category.group_key, language__code="uz"
+            ).first()
+            if uz_cat:
+                return uz_cat.title
+        return obj.help_category.title
+
     help_category_display.short_description = "Категория помощи"
 
     def status_display(self, obj):
