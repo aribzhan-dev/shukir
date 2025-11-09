@@ -4,20 +4,43 @@ function toggleOtherCategory(select) {
     document.getElementById('otherCategoryRow').style.display = isOther ? 'block' : 'none';
 }
 
-function showFileName() {
-    const input = document.getElementById('file');
-    const text = document.getElementById('uploadText');
+function validateFileUpload(event) {
+  const fileInput = document.getElementById("file");
+  const uploadBox = document.querySelector(".upload-box");
+  const uploadText = document.getElementById("uploadText");
+  const uploadError = document.getElementById("uploadError");
 
-    if (input.files.length > 0) {
-        const fileNames = Array.from(input.files).map(f => f.name);
-        let displayText = fileNames.join(', ');
-        if (displayText.length > 50) displayText = displayText.slice(0, 47) + '...';
-        text.textContent = displayText;
-        text.style.color = "#222";
-    } else {
-        text.textContent = "{{ 'file_upload_btn'|translate:lang_code }}";
-        text.style.color = "#666";
-    }
+  if (!fileInput.files.length) {
+    event.preventDefault();
+    uploadBox.style.borderColor = "#e53e3e";
+    uploadBox.style.backgroundColor = "#fff5f5";
+    uploadText.style.color = "#e53e3e";
+    uploadError.style.display = "block";
+    return false;
+  } else {
+    uploadBox.style.borderColor = "#6ad48c";
+    uploadBox.style.backgroundColor = "#f7fff9";
+    uploadText.style.color = "#2f855a";
+    uploadError.style.display = "none";
+    return true;
+  }
+}
+
+function showFileName() {
+  const fileInput = document.getElementById("file");
+  const uploadText = document.getElementById("uploadText");
+  const uploadBox = document.querySelector(".upload-box");
+  const uploadError = document.getElementById("uploadError");
+
+  if (fileInput.files.length > 0) {
+    uploadText.textContent = fileInput.files.length === 1
+      ? fileInput.files[0].name
+      : `${fileInput.files.length} файл танланди`;
+    uploadText.style.color = "#2f855a";
+    uploadBox.style.borderColor = "#6ad48c";
+    uploadBox.style.backgroundColor = "#f7fff9";
+    uploadError.style.display = "none";
+  }
 }
 
 function increaseCount() {

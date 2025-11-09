@@ -167,14 +167,22 @@ form {
 
 .upload-box {
   border: 2px dashed #6ad48c;
-  background-color: rgba(130, 255, 180, 0.08);
-  border-radius: 16px;
-  padding: 40px 20px;
+  border-radius: 8px;
+  padding: 20px;
   text-align: center;
-  cursor: pointer;
+  background-color: #f7fff9;
   transition: all 0.3s ease;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  cursor: pointer;
+}
+
+.upload-box.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 .upload-box:hover {
