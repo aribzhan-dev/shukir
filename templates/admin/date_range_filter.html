@@ -1,31 +1,40 @@
 {% load i18n %}
-<div class="date-filter-container" style="padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#f9fafb;">
-  <div style="font-weight:600;color:#2d3748;margin-bottom:6px;">{% trans "Дата создания (интервал)" %}</div>
+
+<div style="padding:10px;border:1px solid #ddd;border-radius:8px;background:#f9fafb;margin-bottom:10px;">
+  <strong style="display:block;margin-bottom:6px;color:#333;">
+    {% trans "Дата создания (интервал)" %}
+  </strong>
 
   <form method="get" style="display:flex;flex-direction:column;gap:6px;">
-    {% for param, val in cl.params.items %}
-      {% if param != spec.parameter_name and "start_" not in param and "end_" not in param %}
-        <input type="hidden" name="{{ param }}" value="{{ val }}">
+
+    <!-- Boshqa filterlarni saqlash -->
+    {% for key, value in request.GET.items %}
+      {% if key not in "start_date,end_date,date_range" %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
       {% endif %}
     {% endfor %}
 
-    <div style="display:flex;gap:8px;justify-content:space-between;">
-      <label style="flex:1;font-size:13px;color:#4a5568;">
-        <small>{% trans "С:" %}</small>
-        <input type="date" name="start_date" value="{{ request.GET.start_date }}" style="width:100%;padding:5px;border:1px solid #cbd5e0;border-radius:4px;">
-      </label>
+    <!-- Bu juda muhim! "custom" qiymati yuborilishi kerak -->
+    <input type="hidden" name="date_range" value="custom">
 
-      <label style="flex:1;font-size:13px;color:#4a5568;">
+    <div style="display:flex;gap:6px;">
+      <label style="flex:1;font-size:13px;">
+        <small>{% trans "С:" %}</small>
+        <input type="date" name="start_date" value="{{ request.GET.start_date }}"
+               style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;">
+      </label>
+      <label style="flex:1;font-size:13px;">
         <small>{% trans "По:" %}</small>
-        <input type="date" name="end_date" value="{{ request.GET.end_date }}" style="width:100%;padding:5px;border:1px solid #cbd5e0;border-radius:4px;">
+        <input type="date" name="end_date" value="{{ request.GET.end_date }}"
+               style="width:100%;padding:5px;border:1px solid #ccc;border-radius:4px;">
       </label>
     </div>
 
-    <div style="display:flex;gap:6px;justify-content:flex-end;">
-      <button type="submit" style="background:#2b6cb0;color:white;border:none;border-radius:4px;padding:5px 10px;cursor:pointer;">
+    <div style="display:flex;justify-content:flex-end;gap:6px;">
+      <button type="submit" style="background:#007bff;color:white;border:none;border-radius:4px;padding:5px 10px;">
         {% trans "Применить" %}
       </button>
-      <a href="{{ request.path }}" style="text-decoration:none;background:#edf2f7;color:#2d3748;border-radius:4px;padding:5px 10px;">
+      <a href="{{ request.path }}" style="background:#eee;color:#333;border-radius:4px;padding:5px 10px;text-decoration:none;">
         {% trans "Очистить" %}
       </a>
     </div>

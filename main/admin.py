@@ -7,9 +7,9 @@ from main.models import (
     Employee, Archive
 )
 from django.utils.html import format_html
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
-
+from django.utils import timezone
 
 
 
@@ -207,42 +207,50 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 
+from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from datetime import datetime, timedelta
+
+
 class DateRangeFilter(admin.SimpleListFilter):
     title = _("Дата создания (интервал)")
-    parameter_name = "created_range"
+    parameter_name = "date_range"  # Bu nomni o'zgartirdik!
+
     template = "admin/date_range_filter.html"
 
     def lookups(self, request, model_admin):
-        return (("custom", "Диапазон"),)
+        return (
+            ("custom", _("Интервал")),  # Bu shart! "custom" qiymati
+        )
 
     def queryset(self, request, queryset):
-        start_date = request.GET.get("start_date", "").strip()
-        end_date = request.GET.get("end_date", "").strip()
+        if self.value() != "custom":  # Faqat "custom" tanlanganda ishlaydi
+            return queryset
 
-        if start_date:
-            try:
-                start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-            except ValueError:
-                start_date = None
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
 
-        if end_date:
-            try:
-                end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-            except ValueError:
-                end_date = None
+        filters = {}
+        try:
+            if start_date:
+                start = datetime.strptime(start_date, "%Y-%m-%d")
+                start = timezone.make_aware(start)
+                filters["created_at__gte"] = start
 
-        if start_date and end_date:
-            return queryset.filter(created_at__date__range=(start_date, end_date))
-        elif start_date:
-            return queryset.filter(created_at__date__gte=start_date)
-        elif end_date:
-            return queryset.filter(created_at__date__lte=end_date)
-        return queryset
+            if end_date:
+                end = datetime.strptime(end_date, "%Y-%m-%d")
+                end = timezone.make_aware(end) + timedelta(days=1)
+                filters["created_at__lt"] = end
+        except ValueError:
+            return queryset
+
+        return queryset.filter(**filters)
 
 
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
-    list_display = ("id", "help_category", "money", "created_at", "status")
+    list_display = ("id", "help_category_display", "money", "created_at", "status_display")
     list_filter = (DateRangeFilter,)
     search_fields = (
         "help_request__name",
@@ -255,18 +263,10 @@ class ArchiveAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     list_per_page = 30
 
-    def help_request_display(self, obj):
-        return f"{obj.help_request.name} {obj.help_request.surname}" if obj.help_request else "—"
-    help_request_display.short_description = "Заявитель"
-
-    def employee_display(self, obj):
-        return f"{obj.employee.first_name} {obj.employee.last_name}" if obj.employee else "—"
-    employee_display.short_description = "Ответственный сотрудник"
-
+    # To'g'ri metod
     def help_category_display(self, obj):
         if not obj.help_category:
             return "—"
-
         if obj.help_category.group_key:
             uz_cat = HelpCategory.objects.filter(
                 group_key=obj.help_category.group_key, language__code="uz"
@@ -277,12 +277,9 @@ class ArchiveAdmin(admin.ModelAdmin):
 
     help_category_display.short_description = "Категория помощи"
 
+    # To'g'ri metod
     def status_display(self, obj):
-        if obj.status == 0:
-            return "Новая"
-        elif obj.status == 1:
-            return "Одобрена"
-        elif obj.status == 2:
-            return "Отклонена"
-        return "Неизвестно"
+        statuses = {0: "Новая", 1: "Одобрена", 2: "Отклонена"}
+        return statuses.get(obj.status, "Неизвестно")
+
     status_display.short_description = "Статус"
