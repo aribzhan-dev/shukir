@@ -76,7 +76,7 @@ class HelpRequest(models.Model):
     iin = models.CharField( max_length=12, blank=True, verbose_name="ИИН")
     why_need_help = models.TextField(verbose_name="Причина обращения за помощью")
     received_other_help = models.BooleanField(default=False, verbose_name="Получал(а) ли ранее помощь от других фондов")
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Создано в")
     status = models.IntegerField( default=0, verbose_name="Статус")
 
     def __str__(self):
