@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'phonenumber_field',
+    'rangefilter',
 ]
 
 MIDDLEWARE = [
@@ -127,64 +128,35 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# for django decoration
+
+
+
 JAZZMIN_SETTINGS = {
-    # 🔹 Основная информация
     "site_title": "Shukir — Админ панель",
     "site_header": "Shukir Благотворительный фонд",
     "site_brand": "Shukir",
     "welcome_sign": "Добро пожаловать, администратор!",
     "copyright": "© 2025 Designed by IThub",
 
-
-    "site_logo": "img/shukir.jpeg",
-    "site_logo_classes": "img-fluid",
-    "site_logo_width": "180px",
-    "site_logo_height": "180px",
-    "site_brand_text": "Благотворительный фонд",
-
-
-    "login_logo": "img/shukir.jpeg",
-    "login_logo_classes": "img-fluid rounded",
-    "login_logo_width": "100px",
-    "login_logo_height": "100px",
-
+    "custom_css": "css/custom.css",
 
     "theme": "flatly",
-    "dark_mode_theme": None,
     "show_ui_builder": False,
-
-
     "navigation_expanded": False,
-    "hide_apps": [],
-    "hide_models": [],
-
 
     "icons": {
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
         "main.HelpRequest": "fas fa-hand-holding-heart",
         "main.HelpCategory": "fas fa-list",
-        "main.Translation": "fas fa-language",
-        "main.Language": "fas fa-globe",
-        "main.MaterialsStatus": "fas fa-ring",
-        "main.HelpRequestFile": "fas fa-file-upload",
     },
-
 
     "usermenu_links": [
         {"name": "Перейти на сайт", "url": "https://shukir.kz", "new_window": True},
         {"model": "auth.user"},
     ],
-
-
-    "site_title_template": "Shukir | Администрирование",
-    "welcome_sign": "Добро пожаловать в панель управления!",
-    "show_sidebar": True,
-
-
-    "language_chooser": False,
 }
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
