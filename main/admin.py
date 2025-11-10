@@ -6,6 +6,7 @@ from main.models import (
     HelpRequest, HelpCategory, HelpRequestFile,
     Employee, Archive
 )
+from rangefilter.filters import DateRangeFilter
 from django.utils.html import format_html
 from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
@@ -207,51 +208,14 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 
-from django.contrib import admin
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from datetime import datetime, timedelta
-
-
-class DateRangeFilter(admin.SimpleListFilter):
-    title = _("Дата создания (интервал)")
-    parameter_name = "date_range"  # Bu nomni o'zgartirdik!
-
-    template = "admin/date_range_filter.html"
-
-    def lookups(self, request, model_admin):
-        return (
-            ("custom", _("Интервал")),  # Bu shart! "custom" qiymati
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() != "custom":  # Faqat "custom" tanlanganda ishlaydi
-            return queryset
-
-        start_date = request.GET.get("start_date")
-        end_date = request.GET.get("end_date")
-
-        filters = {}
-        try:
-            if start_date:
-                start = datetime.strptime(start_date, "%Y-%m-%d")
-                start = timezone.make_aware(start)
-                filters["created_at__gte"] = start
-
-            if end_date:
-                end = datetime.strptime(end_date, "%Y-%m-%d")
-                end = timezone.make_aware(end) + timedelta(days=1)
-                filters["created_at__lt"] = end
-        except ValueError:
-            return queryset
-
-        return queryset.filter(**filters)
-
 
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
     list_display = ("id", "help_category_display", "money", "created_at", "status_display")
-    list_filter = (DateRangeFilter,)
+    list_filter = (
+        ('created_at', DateRangeFilter),
+    )
+
     search_fields = (
         "help_request__name",
         "help_request__surname",
@@ -263,7 +227,6 @@ class ArchiveAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     list_per_page = 30
 
-    # To'g'ri metod
     def help_category_display(self, obj):
         if not obj.help_category:
             return "—"
@@ -277,7 +240,6 @@ class ArchiveAdmin(admin.ModelAdmin):
 
     help_category_display.short_description = "Категория помощи"
 
-    # To'g'ri metod
     def status_display(self, obj):
         statuses = {0: "Новая", 1: "Одобрена", 2: "Отклонена"}
         return statuses.get(obj.status, "Неизвестно")

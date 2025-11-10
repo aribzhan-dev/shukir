@@ -1,0 +1,135 @@
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #f8f9fa;
+}
+
+.rangefilter {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.rangefilter .form-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.rangefilter label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    flex: 0 0 60px;
+}
+
+.rangefilter input[type="date"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.rangefilter input[type="date"]:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    outline: none;
+}
+
+.rangefilter .submit-row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+
+.rangefilter input[type="submit"] {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.rangefilter input[type="submit"]:hover {
+    background: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+
+.rangefilter input[type="reset"] {
+    background: #ffc107 !important;
+    color: #212529 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 18px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+}
+
+.rangefilter input[type="reset"]:hover {
+    background: #e0a800 !important;
+}
+
+#changelist-search {
+    margin-bottom: 20px;
+}
+
+#searchbar {
+    border: 2px solid #28a745;
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-size: 15px;
+    width: 320px;
+    transition: all 0.3s;
+}
+
+#searchbar:focus {
+    border-color: #218838;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+
+#changelist-search input[type="submit"] {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 15px;
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+#changelist-search input[type="submit"]:hover {
+    background: #218838;
+}
+
+
+.results table thead th {
+    background: #28a745 !important;
+    color: white !important;
+    font-weight: 400;
+    text-align: center;
+    font-size: 14px;
+}
+
+.results table tbody tr:hover {
+    background: #f1f8e9 !important;
+}
+
+.results table td, .results table th {
+    padding: 14px 10px !important;
+    font-size: 14px;
+}
