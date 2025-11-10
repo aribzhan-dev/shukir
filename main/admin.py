@@ -10,9 +10,7 @@ from .models import (
 )
 
 
-# ================================
-# 1. LANGUAGE
-# ================================
+
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ("title", "code", "status")
@@ -24,9 +22,7 @@ class LanguageAdmin(admin.ModelAdmin):
         verbose_name_plural = "Языки"
 
 
-# ================================
-# 2. HELP CATEGORY
-# ================================
+
 @admin.register(HelpCategory)
 class HelpCategoryAdmin(admin.ModelAdmin):
     list_display = ("title", "status")
@@ -38,9 +34,7 @@ class HelpCategoryAdmin(admin.ModelAdmin):
         verbose_name_plural = "Категории помощи"
 
 
-# ================================
-# 3. MATERIALS STATUS
-# ================================
+
 @admin.register(MaterialsStatus)
 class MaterialsStatusAdmin(admin.ModelAdmin):
     list_display = ("title", "language", "status")
@@ -52,9 +46,7 @@ class MaterialsStatusAdmin(admin.ModelAdmin):
         verbose_name_plural = "Статусы материалов"
 
 
-# ================================
-# 4. UZBEK CATEGORY FILTER
-# ================================
+
 class UzbekCategoryFilter(admin.SimpleListFilter):
     title = "Категория помощи"
     parameter_name = "help_category_group"
@@ -81,9 +73,7 @@ class UzbekCategoryFilter(admin.SimpleListFilter):
         return queryset.filter(help_category_id__in=related_ids)
 
 
-# ================================
-# 5. HELP REQUEST FILE INLINE
-# ================================
+
 class HelpRequestFileInline(admin.TabularInline):
     model = HelpRequestFile
     extra = 0
@@ -103,9 +93,7 @@ class HelpRequestFileInline(admin.TabularInline):
     view_file.short_description = "Файл"
 
 
-# ================================
-# 6. HELP REQUEST
-# ================================
+
 @admin.register(HelpRequest)
 class HelpRequestAdmin(admin.ModelAdmin):
     list_display = (
@@ -192,9 +180,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
 
-# ================================
-# 7. HELP REQUEST FILE
-# ================================
+
 @admin.register(HelpRequestFile)
 class HelpRequestFileAdmin(admin.ModelAdmin):
     list_display = ("help_request", "file")
@@ -205,9 +191,7 @@ class HelpRequestFileAdmin(admin.ModelAdmin):
         verbose_name_plural = "Файлы заявок"
 
 
-# ================================
-# 8. TRANSLATION
-# ================================
+
 @admin.register(Translation)
 class TranslationAdmin(admin.ModelAdmin):
     list_display = ("key", "language", "value")
@@ -219,9 +203,7 @@ class TranslationAdmin(admin.ModelAdmin):
         verbose_name_plural = "Переводы"
 
 
-# ================================
-# 9. EMPLOYEE
-# ================================
+
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("id", "first_name", "last_name", "status_display")
@@ -239,9 +221,8 @@ class EmployeeAdmin(admin.ModelAdmin):
     status_display.short_description = "Статус"
 
 
-# ================================
-# 10. ARCHIVE
-# ================================
+
+
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
     list_display = ("id", "help_category_display", "money", "created_at", "status_display")
