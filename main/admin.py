@@ -74,6 +74,27 @@ class UzbekCategoryFilter(admin.SimpleListFilter):
         return queryset.filter(help_category_id__in=related_ids)
 
 
+class HelpRequestFileInline(admin.TabularInline):
+    model = HelpRequestFile
+    extra = 0
+    fields = ("file", "view_file_button")
+    readonly_fields = ("view_file_button",)
+
+    def view_file_button(self, obj):
+        if not obj.file:
+            return "—"
+
+        file_url = obj.file.url
+        return format_html(
+            '<a href="{}" target="_blank" style="'
+            'background:#28a745;color:white;padding:6px 12px;border-radius:8px;'
+            'text-decoration:none;font-weight:600;font-size:13px;'
+            '">Смотреть файл</a>',
+            file_url
+        )
+
+    view_file_button.short_description = "Файл"
+
 
 @admin.register(HelpRequest)
 class HelpRequestAdmin(admin.ModelAdmin):
@@ -92,7 +113,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
     list_per_page = 30
     ordering = ("-id",)
     change_list_template = "admin/help_request_changelist.html"
-
+    inlines = [HelpRequestFileInline]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -184,6 +205,9 @@ class HelpRequestAdmin(admin.ModelAdmin):
 class HelpRequestFileAdmin(admin.ModelAdmin):
     list_display = ("help_request", "file")
     search_fields = ("help_request__name", "help_request__surname")
+
+
+
 
 
 @admin.register(Translation)
