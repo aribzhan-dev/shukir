@@ -154,6 +154,8 @@ JAZZMIN_SETTINGS = {
         "main.HelpRequestFile": "fas fa-paperclip",
         "main.Language": "fas fa-globe",
         "main.MaterialsStatus": "fas fa-boxes",
+        "auth.Group": "fas fa-user-shield",
+                "auth.User": "fas fa-user",
     },
 
     "default_icon_parents": "fas fa-folder",

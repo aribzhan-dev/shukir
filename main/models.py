@@ -66,7 +66,6 @@ class HelpRequest(models.Model):
     name = models.CharField( max_length=200, verbose_name="Имя")
     surname = models.CharField( max_length=200, verbose_name="Фамилия")
     age = models.IntegerField( default=0, blank=True, verbose_name="Возраст")
-    email = models.EmailField( blank=True, null=True, verbose_name="Электронная почта")
     phone_number = PhoneNumberField(region="KZ", verbose_name="Номер телефона")
     material_status = models.ForeignKey( MaterialsStatus, on_delete=models.CASCADE, verbose_name="Семейное положение")
     help_category = models.ForeignKey(HelpCategory, on_delete=models.CASCADE, verbose_name="Категория помощи", blank=True, null=True)
