@@ -99,7 +99,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
     list_display = (
         "id", "name", "surname", "phone_number",
         "help_category_display", "received_other_help_display",
-        "status", "whatsapp_link"
+        "created_at", "whatsapp_link"
     )
     list_filter = (UzbekCategoryFilter, "received_other_help", "status")
     search_fields = ("name", "surname", "iin", "phone_number", "address")
