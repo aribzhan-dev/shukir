@@ -132,33 +132,35 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Shukir — Админ панель",
-    "site_header": "Shukir Благотворительный фонд",
-    "site_brand": "Shukir",
-    "welcome_sign": "Добро пожаловать, администратор!",
+    "site_title": "Shukir.kz",
+    "site_header": "SHUKIR ҚАЙЫРЫМДЫЛЫҚ ҚОРЫ",
+    "site_brand": "SHUKIR",
+    "site_logo": "img/logo.png",
+    "site_logo_classes": "img-circle",
+    "site_icon": "img/logo.png",
+    "welcome_sign": "Қош келдіңіз, admin!",
     "copyright": "© 2025 Designed by IThub",
 
-    "custom_css": "css/custom.css",
-
-    "theme": "flatly",
-    "show_ui_builder": False,
-    "navigation_expanded": False,
+    "usermenu_links": [
+        {"name": "Перейти на сайт", "url": "https://shukir.kz", "icon": "fas fa-globe"},
+    ],
 
     "icons": {
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "main.HelpRequest": "fas fa-hand-holding-heart",
-        "main.HelpCategory": "fas fa-list",
+        "main.Archive": "fas fa-archive",
+        "main.HelpRequest": "fas fa-hands-helping",
+        "main.HelpCategory": "fas fa-tags",
+        "main.Translation": "fas fa-language",
+        "main.Employee": "fas fa-users-cog",
+        "main.HelpRequestFile": "fas fa-paperclip",
+        "main.Language": "fas fa-globe",
+        "main.MaterialsStatus": "fas fa-boxes",
     },
 
-    "usermenu_links": [
-        {"name": "Перейти на сайт", "url": "https://shukir.kz", "new_window": True},
-        {"model": "auth.user"},
-    ],
+    "default_icon_parents": "fas fa-folder",
+    "related_modal_active": True,
 }
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
