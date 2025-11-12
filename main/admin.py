@@ -6,7 +6,7 @@ from rangefilter.filters import DateRangeFilter
 from .models import (
     Language, Translation, MaterialsStatus,
     HelpRequest, HelpCategory, HelpRequestFile,
-    Employee, Archive
+    Employee, Archive, HelpStatus
 )
 
 
@@ -93,15 +93,27 @@ class HelpRequestFileInline(admin.TabularInline):
     view_file.short_description = "Файл"
 
 
+@admin.register(HelpStatus)
+class HelpStatusAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "status")
+    list_filter = ("status",)
+    search_fields = ("title",)
+    ordering = ("title",)
+    list_per_page = 25
+
+    def __str__(self):
+        return self.title
+
+
 
 @admin.register(HelpRequest)
 class HelpRequestAdmin(admin.ModelAdmin):
     list_display = (
         "id", "name", "surname", "phone_number",
         "help_category_display", "received_other_help_display",
-        "created_at", "whatsapp_link"
+        "created_at", "help_status_colored" ,"whatsapp_link"
     )
-    list_filter = (UzbekCategoryFilter, "received_other_help", "status")
+    list_filter = (UzbekCategoryFilter, "received_other_help", "help_status")
     search_fields = ("name", "surname", "iin", "phone_number", "address")
     list_per_page = 30
     ordering = ("-id",)
@@ -144,7 +156,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
             'text-decoration:none;font-weight:600;font-size:12px;">WhatsApp</a>',
             wa_url
         )
-    whatsapp_link.short_description = "Связаться в WhatsApp"
+    whatsapp_link.short_description = "WhatsApp"
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -178,6 +190,32 @@ class HelpRequestAdmin(admin.ModelAdmin):
             "categories": merged_categories,
         }
         return super().changelist_view(request, extra_context=extra_context)
+
+    def help_status_colored(self, obj):
+        if not obj.help_status:
+            return "—"
+
+
+        colors = {
+            "Новый": "#007bff",
+            "В обработке": "#ffc107",
+            "Одобрен": "#28a745",
+            "Отклонен": "#dc3545",
+            "В ожидании": "#17a2b8",
+            "Выполнен": "#6f42c1",
+            "Отменен": "#6c757d",
+            "Архив": "#343a40",
+        }
+
+        color = colors.get(obj.help_status.title, "#adb5bd")
+        return format_html(
+            '<span style="background-color:{}; color:white; padding:3px 8px; '
+            'border-radius:5px; font-weight:600;">{}</span>',
+            color,
+            obj.help_status.title
+        )
+
+    help_status_colored.short_description = "Статус помощи"
 
 
 

@@ -1,3 +1,5 @@
+from tkinter.constants import CASCADE
+
 from django.db import models
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
@@ -59,6 +61,17 @@ class HelpCategory(models.Model):
         verbose_name_plural = "Категории помощи"
 
 
+class HelpStatus(models.Model):
+    title = models.CharField("Название статуса", max_length=50, unique=True)
+    status = models.IntegerField("Статус активности", default=0)
+
+    class Meta:
+        verbose_name = "Статус помощи"
+        verbose_name_plural = "Статусы помощи"
+
+    def __str__(self):
+        return self.title
+
 
 
 
@@ -70,13 +83,13 @@ class HelpRequest(models.Model):
     material_status = models.ForeignKey( MaterialsStatus, on_delete=models.CASCADE, verbose_name="Семейное положение")
     help_category = models.ForeignKey(HelpCategory, on_delete=models.CASCADE, verbose_name="Категория помощи", blank=True, null=True)
     other_category = models.CharField(max_length=250, blank=True, null=True, verbose_name="Другая категория")
-    child_in_fam = models.IntegerField( default=0, blank=True, verbose_name="Количество детей")
-    address = models.CharField( max_length=200, verbose_name="Адрес")
-    iin = models.CharField( max_length=12, blank=True, verbose_name="ИИН")
+    child_in_fam = models.IntegerField(default=0, blank=True, verbose_name="Количество детей")
+    address = models.CharField(max_length=200, verbose_name="Адрес")
+    iin = models.CharField(max_length=12, blank=True, verbose_name="ИИН")
     why_need_help = models.TextField(verbose_name="Причина обращения за помощью")
     received_other_help = models.BooleanField(default=False, verbose_name="Получал(а) ли ранее помощь от других фондов")
+    help_status = models.ForeignKey(HelpStatus, on_delete=models.CASCADE, verbose_name="Статус помощи", blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Создано в")
-    status = models.IntegerField( default=0, verbose_name="Статус")
 
     def __str__(self):
         return f"{self.name} {self.surname}"
@@ -120,7 +133,7 @@ class Archive(models.Model):
     money = models.DecimalField( default=0.00, max_digits=20, decimal_places=2, verbose_name="Выделенная сумма")
     desc = models.TextField(blank=True, null=True, verbose_name="Комментарий")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
-    status = models.IntegerField(default=0, verbose_name="Статус")
+    help_status = models.ForeignKey(HelpStatus, on_delete=models.CASCADE, verbose_name="Статус помощи", blank=True, null=True)
 
     def __str__(self):
         if self.employee:
