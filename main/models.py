@@ -91,7 +91,8 @@ class HelpRequest(models.Model):
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Создано в")
 
     def __str__(self):
-        return f"{self.name} {self.surname}"
+        cat = self.help_category.title if self.help_category else "Без категории"
+        return f"{self.name} {self.surname} -- {cat}"
 
     class Meta:
         verbose_name = "Заявка на помощь"

@@ -267,12 +267,21 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
-    list_display = ("id", "help_category_display", "money", "created_at", "status_display")
-    list_filter = (('created_at', DateRangeFilter),)
+    list_display = (
+        "id",
+        "help_request_display",
+        "help_category_display",
+        "money",
+        "created_at",
+        "status_display",
+    )
+    list_filter = (("created_at", DateRangeFilter),)
     search_fields = (
-        "help_request__name", "help_request__surname",
-        "employee__first_name", "employee__last_name",
-        "help_category__title"
+        "help_request__name",
+        "help_request__surname",
+        "employee__first_name",
+        "employee__last_name",
+        "help_category__title",
     )
     readonly_fields = ("created_at",)
     ordering = ("-created_at",)
@@ -289,9 +298,45 @@ class ArchiveAdmin(admin.ModelAdmin):
             kwargs["queryset"] = HelpRequest.objects.exclude(id__in=archived_ids)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+    def help_request_display(self, obj):
+        if not obj.help_request:
+            return "—"
+
+        name = obj.help_request.name or ""
+        surname = obj.help_request.surname or ""
+        full_name = f"{name} {surname}".strip()
+
+        phone = obj.help_request.phone_number
+        if not phone:
+            return full_name
+
+        clean_phone = (
+            str(phone)
+            .replace("+", "")
+            .replace(" ", "")
+            .replace("-", "")
+            .replace("(", "")
+            .replace(")", "")
+        )
+
+        wa_url = f"https://wa.me/{clean_phone}"
+        whatsapp_button = format_html(
+            '<a href="{}" target="_blank" '
+            'style="background:#25d366;color:white;padding:3px 8px;'
+            'border-radius:6px;text-decoration:none;font-weight:600;'
+            'margin-left:8px;font-size:12px;">WhatsApp</a>',
+            wa_url,
+        )
+
+        return format_html("{} {}", full_name, whatsapp_button)
+
+    help_request_display.short_description = "Заявка на помощь"
+
+
     def help_category_display(self, obj):
         if not obj.help_category:
-            return "Новый"
+            return "—"
         if obj.help_category.group_key:
             uz_cat = HelpCategory.objects.filter(
                 group_key=obj.help_category.group_key, language__code="uz"
@@ -301,12 +346,14 @@ class ArchiveAdmin(admin.ModelAdmin):
         return obj.help_category.title
     help_category_display.short_description = "Категория помощи"
 
+
     def status_display(self, obj):
         if not obj.help_status:
             return format_html(
                 '<span style="background-color:{}; color:white; padding:4px 10px; '
                 'border-radius:8px; font-weight:600;">{}</span>',
-                "#007bff", "Новый"
+                "#007bff",
+                "Новый",
             )
 
         color_map = {
@@ -325,8 +372,8 @@ class ArchiveAdmin(admin.ModelAdmin):
         return format_html(
             '<span style="background-color:{}; color:white; padding:4px 10px; '
             'border-radius:8px; font-weight:600;">{}</span>',
-            color, title
+            color,
+            title,
         )
 
     status_display.short_description = "Статус помощи"
-
