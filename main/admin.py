@@ -195,7 +195,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
 
     def help_status_color(self, obj):
         if not obj.help_status:
-            return "—"
+            return "Новый"
 
         color_map = {
             "Новый": "#007bff",
@@ -287,7 +287,7 @@ class ArchiveAdmin(admin.ModelAdmin):
 
     def help_category_display(self, obj):
         if not obj.help_category:
-            return "—"
+            return "Новый"
         if obj.help_category.group_key:
             uz_cat = HelpCategory.objects.filter(
                 group_key=obj.help_category.group_key, language__code="uz"
