@@ -195,7 +195,11 @@ class HelpRequestAdmin(admin.ModelAdmin):
 
     def help_status_color(self, obj):
         if not obj.help_status:
-            return "Новый"
+            return format_html(
+                '<span style="background-color:{}; color:white; padding:4px 10px; '
+                'border-radius:8px; font-weight:600;">{}</span>',
+                "#007bff", "Новый"
+            )
 
         color_map = {
             "Новый": "#007bff",
@@ -299,7 +303,11 @@ class ArchiveAdmin(admin.ModelAdmin):
 
     def status_display(self, obj):
         if not obj.help_status:
-            return "—"
+            return format_html(
+                '<span style="background-color:{}; color:white; padding:4px 10px; '
+                'border-radius:8px; font-weight:600;">{}</span>',
+                "#007bff", "Новый"
+            )
 
         color_map = {
             "Новый": "#007bff",
