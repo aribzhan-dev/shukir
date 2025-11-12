@@ -111,7 +111,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
     list_display = (
         "id", "name", "surname", "phone_number",
         "help_category_display", "received_other_help_display",
-        "created_at", "help_status_colored" ,"whatsapp_link"
+        "created_at", "help_status_color", "whatsapp_link"
     )
     list_filter = (UzbekCategoryFilter, "received_other_help", "help_status")
     search_fields = ("name", "surname", "iin", "phone_number", "address")
@@ -124,10 +124,11 @@ class HelpRequestAdmin(admin.ModelAdmin):
         verbose_name = "Заявка на помощь"
         verbose_name_plural = "Заявки на помощь"
 
+    # 🟢 faqat arxivga kirmaganlar (is_archived=False)
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        archived = Archive.objects.filter(help_request=OuterRef("pk"))
-        return qs.annotate(is_archived=Exists(archived)).filter(is_archived=False)
+        archived_ids = Archive.objects.values_list("help_request_id", flat=True)
+        return qs.exclude(id__in=archived_ids)
 
     def help_category_display(self, obj):
         if not obj.help_category:
@@ -158,9 +159,10 @@ class HelpRequestAdmin(admin.ModelAdmin):
         )
     whatsapp_link.short_description = "WhatsApp"
 
+    # 🧮 Statistika (faqat arxivda yo‘q yozuvlar)
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        queryset = self.get_queryset(request)
+        queryset = self.get_queryset(request)  # 🟢 shu joyda to‘g‘ri queryset
 
         total_requests = queryset.count()
         total_received = queryset.filter(received_other_help=True).count()
@@ -191,32 +193,30 @@ class HelpRequestAdmin(admin.ModelAdmin):
         }
         return super().changelist_view(request, extra_context=extra_context)
 
-    def help_status_colored(self, obj):
+    def help_status_color(self, obj):
         if not obj.help_status:
             return "—"
 
-
-        colors = {
+        color_map = {
             "Новый": "#007bff",
-            "В обработке": "#ffc107",
-            "Одобрен": "#28a745",
+            "Обрабатывается": "#ffc107",
+            "Положительно обработан": "#28a745",
             "Отклонен": "#dc3545",
-            "В ожидании": "#17a2b8",
-            "Выполнен": "#6f42c1",
-            "Отменен": "#6c757d",
-            "Архив": "#343a40",
+            "Помогли": "#20c997",
+            "В очереди": "#6f42c1",
+            "Подозрительные": "#fd7e14",
+            "На будущее": "#343a40",
         }
 
-        color = colors.get(obj.help_status.title, "#adb5bd")
+        title = obj.help_status.title
+        color = color_map.get(title, "#6c757d")
         return format_html(
-            '<span style="background-color:{}; color:white; padding:3px 8px; '
-            'border-radius:5px; font-weight:600;">{}</span>',
-            color,
-            obj.help_status.title
+            '<span style="background-color:{}; color:white; padding:4px 10px; '
+            'border-radius:8px; font-weight:600;">{}</span>',
+            color, title
         )
 
-    help_status_colored.short_description = "Статус помощи"
-
+    help_status_color.short_description = "Статус помощи"
 
 
 @admin.register(HelpRequestFile)
@@ -278,6 +278,13 @@ class ArchiveAdmin(admin.ModelAdmin):
         verbose_name = "Архив помощи"
         verbose_name_plural = "Архив помощи"
 
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "help_request":
+            archived_ids = Archive.objects.values_list("help_request_id", flat=True)
+            kwargs["queryset"] = HelpRequest.objects.exclude(id__in=archived_ids)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def help_category_display(self, obj):
         if not obj.help_category:
             return "—"
@@ -291,6 +298,27 @@ class ArchiveAdmin(admin.ModelAdmin):
     help_category_display.short_description = "Категория помощи"
 
     def status_display(self, obj):
-        statuses = {0: "Новая", 1: "Одобрена", 2: "Отклонена"}
-        return statuses.get(obj.status, "Неизвестно")
-    status_display.short_description = "Статус"
+        if not obj.help_status:
+            return "—"
+
+        color_map = {
+            "Новый": "#007bff",
+            "Обрабатывается": "#ffc107",
+            "Положительно обработан": "#28a745",
+            "Отклонен": "#dc3545",
+            "Помогли": "#20c997",
+            "В очереди": "#6f42c1",
+            "Подозрительные": "#fd7e14",
+            "На будущее": "#343a40",
+        }
+
+        title = obj.help_status.title
+        color = color_map.get(title, "#6c757d")
+        return format_html(
+            '<span style="background-color:{}; color:white; padding:4px 10px; '
+            'border-radius:8px; font-weight:600;">{}</span>',
+            color, title
+        )
+
+    status_display.short_description = "Статус помощи"
+

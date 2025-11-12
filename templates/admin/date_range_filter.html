@@ -7,14 +7,14 @@
 
   <form method="get" style="display:flex;flex-direction:column;gap:6px;">
 
-    <!-- Boshqa filterlarni saqlash (date_range ni ham saqlaymiz, agar bor bo'lsa) -->
+
     {% for key, value in request.GET.items %}
       {% if key not in "start_date,end_date" %}
         <input type="hidden" name="{{ key }}" value="{{ value }}">
       {% endif %}
     {% endfor %}
 
-    <!-- BU MUHIM! date_range=custom ni har doim yuboramiz -->
+
     <input type="hidden" name="date_range" value="custom">
 
     <div style="display:flex;gap:6px;">
