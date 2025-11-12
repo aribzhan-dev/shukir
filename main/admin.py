@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Count, OuterRef, Exists
+from django.db.models import Count, OuterRef, Exists, Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilter
@@ -124,7 +124,7 @@ class HelpRequestAdmin(admin.ModelAdmin):
         verbose_name = "Заявка на помощь"
         verbose_name_plural = "Заявки на помощь"
 
-    # 🟢 faqat arxivga kirmaganlar (is_archived=False)
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         archived_ids = Archive.objects.values_list("help_request_id", flat=True)
@@ -265,6 +265,11 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 
+
+
+
+
+
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
     list_display = (
@@ -295,7 +300,19 @@ class ArchiveAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "help_request":
             archived_ids = Archive.objects.values_list("help_request_id", flat=True)
-            kwargs["queryset"] = HelpRequest.objects.exclude(id__in=archived_ids)
+            obj_id = request.resolver_match.kwargs.get("object_id")
+
+            if obj_id:
+                current = Archive.objects.filter(id=obj_id).first()
+                if current and current.help_request_id:
+                    kwargs["queryset"] = HelpRequest.objects.filter(
+                        Q(id=current.help_request_id) | ~Q(id__in=archived_ids)
+                    )
+                else:
+                    kwargs["queryset"] = HelpRequest.objects.exclude(id__in=archived_ids)
+            else:
+                kwargs["queryset"] = HelpRequest.objects.exclude(id__in=archived_ids)
+
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -330,7 +347,6 @@ class ArchiveAdmin(admin.ModelAdmin):
         )
 
         return format_html("{} {}", full_name, whatsapp_button)
-
     help_request_display.short_description = "Заявка на помощь"
 
 
@@ -352,8 +368,7 @@ class ArchiveAdmin(admin.ModelAdmin):
             return format_html(
                 '<span style="background-color:{}; color:white; padding:4px 10px; '
                 'border-radius:8px; font-weight:600;">{}</span>',
-                "#007bff",
-                "Новый",
+                "#007bff", "Новый",
             )
 
         color_map = {
@@ -375,5 +390,4 @@ class ArchiveAdmin(admin.ModelAdmin):
             color,
             title,
         )
-
     status_display.short_description = "Статус помощи"
