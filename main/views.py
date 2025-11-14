@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCategory, HelpRequestFile
+from .models import HelpRequest, Language, MaterialsStatus, Translation, HelpCategory, HelpRequestFile, HelpStatus
 import requests
 import os
 import mimetypes
@@ -41,7 +41,6 @@ def index_handler(request, lang_code="uz"):
         name = request.POST.get("name")
         surname = request.POST.get("surname")
         age = request.POST.get("age")
-        email = request.POST.get("email")
         phone = request.POST.get("phone_number")
         status_id = request.POST.get("material_status")
         category_id = request.POST.get("help_category")
@@ -61,12 +60,12 @@ def index_handler(request, lang_code="uz"):
 
         material_status = MaterialsStatus.objects.filter(id=status_id).first()
         help_category = HelpCategory.objects.filter(id=category_id).first()
+        help_status = HelpStatus.objects.filter(id=status_id).first()
 
         help_request = HelpRequest.objects.create(
             name=name,
             surname=surname,
             age=int(age or 0),
-            email=email,
             phone_number=phone,
             material_status=material_status,
             help_category=help_category,
@@ -76,7 +75,7 @@ def index_handler(request, lang_code="uz"):
             iin=iin,
             why_need_help=reason,
             received_other_help=received_help,
-            status=0,
+            help_status=help_status,
         )
 
 
